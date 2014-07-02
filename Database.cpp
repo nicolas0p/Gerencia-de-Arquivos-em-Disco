@@ -15,5 +15,4 @@ Database::~Database() {
 
 void Database::insert(const Manpage& manpg) {
 	Manpage* manpage = new Manpage(manpg);
-
 }
