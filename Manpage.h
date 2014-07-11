@@ -21,6 +21,7 @@ public:
 
 	string name() const;
 	list<string> words() const;
+	string content() const;
 
 private:
 	string name_;

@@ -3,23 +3,13 @@
 // Author      : 
 // Version     :
 // Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
+// Description :
 //============================================================================
 
 #include <iostream>
 #include <algorithm>
 #include "AvlTree.h"
 using namespace std;
-
-int main() {
-	AvlTree t;
-	cout << t.size() << endl;
-	t.insert(3);
-	cout << t.size() << endl;
-	t.insert(2);
-	cout << t.size() << endl;
-	return 0;
-}
 
 AvlTree::AvlTree() : root(0), _size(0) {}
 

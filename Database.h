@@ -8,6 +8,7 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
+#include <string>
 #include <vector>  //TODO remover
 #define AVLTree std::vector //TODO remover
 
@@ -15,15 +16,15 @@
 
 class Database {
 public:
-	Database();
+	Database(std::string manpageRecordFileName);
 	~Database();
 
 	void insert(const Manpage& manpage);
 
 private:
-	AVLTree<Manpage> primaryIndex; //AVLTree<string, Manpage*> na verdade o Manpage* é o "endereco" do inicio da manpage no registro
-	AVLTree<Manpage> secondaryIndex; //AVLTree<string, list<Manpage*>>
-
+	AVLTree<string> primaryIndex; //AVLTree<string, Manpage*> na verdade o Manpage* é o "endereco" do inicio da manpage no registro
+	AVLTree<string> secondaryIndex; //AVLTree<string, list<Manpage*>>
+	std::string manpageRecordFileName_;
 };
 
 #endif /* DATABASE_H_ */

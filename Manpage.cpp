@@ -24,10 +24,10 @@ list<string> Manpage::words() const {
 	return words_;
 }
 
-bool operator<(const Manpage& left, const Manpage& right) const {
+bool operator<(const Manpage& left, const Manpage& right) {
 	return left.name() < right.name();
 }
 
-bool operator>(const Manpage& left, const Manpage& right) const {
+bool operator>(const Manpage& left, const Manpage& right) {
 	return left.name() > right.name();
 }
