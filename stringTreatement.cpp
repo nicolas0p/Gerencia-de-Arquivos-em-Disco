@@ -9,7 +9,7 @@
 #include <string>
 
 using namespace std;
-
+/*
 vector<string> connectives() {
 	vector<string> connectives;
 
@@ -18,7 +18,7 @@ vector<string> connectives() {
 	 * http://www.english-grammar-revolution.com/list-of-prepositions.html
 	 * http://www.english-grammar-revolution.com/list-of-pronouns.html
 	 */
-
+/*
 // articles
 	connectives.push_back(string ( "a" )).push_back(string ( "an" )).push_back(string ( "the" )).push_back(string ( "no" ));
 
@@ -135,3 +135,4 @@ vector<string> purify(string word) {
 	}
 	return list;
 }
+*/

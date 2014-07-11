@@ -35,13 +35,18 @@ Manpage readFile(string fileName) { //possível otimização para lista com veto
 int main(int argc, char** argv) {
 	Database database("manpages.dat", "invertedLists.dat");
 	vector<string> words;
+	size_t greaterName = 0, greaterContent = 0;
 	for (--argc; argc > 0; --argc) { //argv[0] é o nome do nosso comando
 		string filename = argv[argc], concatenated(""), actual;
 		ifstream file(filename.c_str());
-		while (file >> actual) {
-			concatenated += actual + " ";
-			words.push_back(actual);
+		while (getline(file,actual)) {
+			concatenated += actual + "\n";
+			stringstream line(actual);
+			while(line >> actual) {
+				words.push_back(actual);
+			}
 		}
 		database.insert(Manpage(filename, words), diskManpage(filename.c_str(), concatenated.c_str()));
 	}
+	cout << database.nameQuery(argv[0]).content << endl;
 }

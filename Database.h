@@ -15,8 +15,8 @@
 
 #include "Manpage.h"
 
-#define MAX_MANPAGE_NAME_SIZE 80 //estes numeros foram obtidos a partir de testes nas manpages
-#define MAX_MANPAGE_CONTENT 392769
+#define MAX_MANPAGE_NAME_SIZE 52 //estes numeros foram obtidos a partir de testes nas manpages
+#define MAX_MANPAGE_CONTENT 139646
 
 struct diskManpage { //struct que vai ser gravada em disco, nos registros
 	char name[MAX_MANPAGE_NAME_SIZE];
@@ -37,7 +37,7 @@ public:
 
 	void insert(const Manpage& manpage, const diskManpage& disk);
 	diskManpage nameQuery(string name);
-	vector<string> contentQuery(string word)
+	vector<string> contentQuery(string word);
 
 private:
 	AVLTree<string> primaryIndex; //AVLTree<string, Manpage*> na verdade o Manpage* é o "endereco" do inicio da manpage no registro
