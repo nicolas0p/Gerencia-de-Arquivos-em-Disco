@@ -7,7 +7,7 @@
 
 #include "Manpage.h"
 
-Manpage::Manpage(string name, list<string> words) : name_(name), words_(words){
+Manpage::Manpage(string name, std::vector<string> words) : name_(name), words_(words){
 }
 
 Manpage::Manpage(const Manpage& manpage) : name_(manpage.name()), words_(manpage.words()){
@@ -20,7 +20,7 @@ string Manpage::name() const {
 	return name_;
 }
 
-list<string> Manpage::words() const {
+std::vector<string> Manpage::words() const {
 	return words_;
 }
 

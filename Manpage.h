@@ -9,23 +9,22 @@
 #define MANPAGE_H_
 
 #include <string>
-#include <list>
+#include <vector>
 
 using namespace std;
 
 class Manpage {
 public:
-	Manpage(string name, list<string> words);
+	Manpage(string name, vector<string> words);
 	Manpage(const Manpage& manpage);
 	~Manpage();
 
 	string name() const;
-	list<string> words() const;
-	string content() const;
+	vector<string> words() const;
 
 private:
 	string name_;
-	list<string> words_;
+	vector<string> words_;
 };
 
 #endif /* MANPAGE_H_ */
