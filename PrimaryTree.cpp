@@ -7,6 +7,7 @@
 //============================================================================
 
 #include <algorithm>
+#include <iostream>
 #include <string>
 
 #include "PrimaryTree.h"

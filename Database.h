@@ -15,7 +15,7 @@
 #include "PrimaryTree.h"
 #include "SecundaryTree.h"
 
-const int MAX_MANPAGE_NAME_SIZE = 52; //estes numeros foram obtidos a partir de testes nas manpages
+const int MAX_MANPAGE_NAME_SIZE = 53; //estes numeros foram obtidos a partir de testes nas manpages
 const int MAX_MANPAGE_CONTENT = 140000;
 
 
@@ -42,14 +42,15 @@ public:
 	void insert(const Manpage& manpage, const diskManpage& disk);
 	diskManpage nameQuery(string name);
 	vector<string> contentQuery(string word);
+	vector<string> multipleContentQuery(string word1, string word2);
+	void clear();
 
 private:
 	PrimaryTree primaryIndex;
 	SecundaryTree secondaryIndex;
 	std::string manpageRecordFileName_;
 	std::string invertedListRecordFileName_;
-	int invertedListIndex;
-	int manpageIndex;
+	int manpageIndex_;
 
 
 	void writeRecord(diskManpage manpage, string fileName, int index);

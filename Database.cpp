@@ -22,8 +22,7 @@ using namespace std;
 Database::Database(string manpageRecordFileName,
 		string invertedListRecordFileName) :
 		primaryIndex(), secondaryIndex(), manpageRecordFileName_(
-				manpageRecordFileName), invertedListRecordFileName_(
-				invertedListRecordFileName), invertedListIndex(0), manpageIndex(0) {
+				manpageRecordFileName), invertedListRecordFileName_(invertedListRecordFileName), manpageIndex_(0) {
 }
 
 Database::~Database() {
@@ -31,19 +30,20 @@ Database::~Database() {
 
 /**
  * Adiciona uma manpage no banco de dados
- * Isso inclui sua indexacao primaria(pelo seu nome) e secundaria(por todas as palavras que ele contem)
+ * Isso inclui sua indexacao primaria(pelo seu nome) e secundaria(por todas as palavras que ela contem)
  *
  * @param manpage a ser adicionada no banco de dados
  * @param diskManpage a ser adicionada nos registros
  */
 void Database::insert(const Manpage& manpage, const diskManpage& disk) {
-	writeRecord(disk, manpageRecordFileName_, manpageIndex);
-	primaryIndex.insert(manpage.name(), manpageIndex);
+	writeRecord(disk, manpageRecordFileName_, manpageIndex_);
+	primaryIndex.insert(manpage.name(), manpageIndex_);
+
 	vector<string> words = manpage.words();
-	for(size_t i = 0 ; i < manpage.words().size() ; ++i) { //adicionar todas as palavras do conteudo na indexacao secundaria
-		//secondaryIndex.insert(words[i], manpageIndex);
+	for (size_t i = 0; i < words.size(); ++i) { //adicionar todas as palavras do conteudo na indexacao secundaria
+		secondaryIndex.insert(words[i], manpageIndex_);
 	}
-	++manpageIndex; //atualizar index
+	++manpageIndex_; //atualizar index
 }
 
 /**
@@ -52,7 +52,7 @@ void Database::insert(const Manpage& manpage, const diskManpage& disk) {
  * @return manpage com o nome recebido
  */
 diskManpage Database::nameQuery(string name) {
-	int position = 0;//primaryIndex.search(name);
+	int position = primaryIndex.search(name);
 	return readRecord(manpageRecordFileName_, position);
 }
 /**
@@ -63,10 +63,41 @@ diskManpage Database::nameQuery(string name) {
 vector<string> Database::contentQuery(string word) {
 	deque<int> invertedList = secondaryIndex.search(word);
 	vector<string> ret;
-	for(size_t i = 0 ; i < invertedList.size() ; ++i) {
+	for (size_t i = 0; i < invertedList.size(); ++i) {
 		ret.push_back(readName(manpageRecordFileName_, invertedList[i]));
 	}
 	return ret;
+}
+
+/**
+ * Pesquisa no banco de dados por manpages que contenham as duas palavras recebidas
+ * @param Palavra 1 que se quer encontrar manpages que contenham
+ * @param Palavra 1 que também se quer encontrar manpages que contenham
+ * @return vetor contendo o nome de todas as manpages que contem ambas as palavras
+ */
+vector<string> Database::multipleContentQuery(string word1, string word2) {
+	vector<string> ret;
+	deque<int> lesser = secondaryIndex.search(word1);
+	deque<int> greater = secondaryIndex.search(word2);
+
+	if (greater.size() < lesser.size()) {
+		swap(greater, lesser);
+	}
+
+	for (size_t i = 0; i < lesser.size(); ++i) {
+		for (size_t j = 0; j < greater.size(); ++j)
+			if (lesser[i] == greater[j]) {
+				string toAdd = readName(manpageRecordFileName_, lesser[i]);
+				ret.push_back(toAdd);
+			}
+	}
+
+	return ret;
+}
+
+void Database::clear() {
+	ofstream manpage(manpageRecordFileName_.c_str(), ios::trunc);
+	ofstream inverted(invertedListRecordFileName_.c_str(), ios::trunc);
 }
 
 /**
@@ -89,7 +120,6 @@ void Database::writeRecord(diskManpage manpage, string fileName, int index) {
 	diskManpage disk(manpage.name, manpage.content);
 
 	output.write((char *) &disk, sizeof(diskManpage));
-	output.close();
 }
 
 /**
@@ -97,7 +127,7 @@ void Database::writeRecord(diskManpage manpage, string fileName, int index) {
  * @param a posicao do registro que sera lido
  * @return diskManpage lido da posicao recordIndex
  */
-diskManpage Database::readRecord(string fileName,int recordIndex) {
+diskManpage Database::readRecord(string fileName, int recordIndex) {
 	ifstream input(fileName.c_str(), ios::in | ios::binary);
 
 	if (!input) {
@@ -108,7 +138,6 @@ diskManpage Database::readRecord(string fileName,int recordIndex) {
 
 	diskManpage mp("", "");
 	input.read((char *) &mp, sizeof(diskManpage));
-	input.close();
 
 	return mp;
 }
@@ -118,18 +147,19 @@ diskManpage Database::readRecord(string fileName,int recordIndex) {
  * @param a posicao do registro que sera lido
  * @return nome do comando na posicao recordIndex
  */
-string Database::readName(string fileName,int recordIndex) {
+string Database::readName(string fileName, int recordIndex) {
 	ifstream input(fileName.c_str(), ios::in | ios::binary);
 
-		if (!input) {
-			cout << "Erro ao abrir arquivo" << endl;
-		}
+	if (!input) {
+		cout << "Erro ao abrir arquivo" << endl;
+	}
 
-		input.seekg(streampos(recordIndex * sizeof(diskManpage)));
+	input.seekg(streampos(recordIndex * sizeof(diskManpage)));
 
-		string ret("");
-		input.read((char *) &ret, MAX_MANPAGE_NAME_SIZE);
-		input.close();
+	char name[MAX_MANPAGE_NAME_SIZE];
 
-		return ret;
+	input.read(name, MAX_MANPAGE_NAME_SIZE);
+
+
+	return name;
 }

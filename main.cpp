@@ -32,19 +32,29 @@ Manpage readFile(string fileName) { //possível otimização para lista com veto
 /**
  * Adiciona todas as manpages ao banco de dados
  */
+
 int main(int argc, char** argv) {
 	Database database("manpages.dat", "invertedLists.dat");
+	database.clear();
 	vector<string> words;
 	for (--argc; argc > 0; --argc) { //argv[0] é o nome do nosso comando
 		string filename = argv[argc], concatenated(""), actual;
 		ifstream file(filename.c_str());
-		while (getline(file,actual)) {
+		while (getline(file, actual)) {
 			concatenated += actual + "\n";
 			stringstream line(actual);
-			while(line >> actual) {
+			while (line >> actual) {
 				words.push_back(actual);
 			}
 		}
 		database.insert(Manpage(filename, words), diskManpage(filename.c_str(), concatenated.c_str()));
 	}
+
+	string word("and");
+	vector<string> contem = database.contentQuery(word);
+	cout << "As manpages que contem a palavra " << word << "são : " << endl;
+	for (size_t i = 0; i < contem.size(); ++i) {
+		cout << contem[i] << endl;
+	}
+
 }
