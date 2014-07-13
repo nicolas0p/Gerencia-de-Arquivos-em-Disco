@@ -10,15 +10,20 @@
 
 #include <string>
 #include <cstring> //strcpy
-#include <vector>  //TODO remover
-#define AVLTree std::vector //TODO remover
 
 #include "Manpage.h"
+#include "PrimaryTree.h"
+#include "SecundaryTree.h"
 
-#define MAX_MANPAGE_NAME_SIZE 52 //estes numeros foram obtidos a partir de testes nas manpages
-#define MAX_MANPAGE_CONTENT 139646
+const int MAX_MANPAGE_NAME_SIZE = 52; //estes numeros foram obtidos a partir de testes nas manpages
+const int MAX_MANPAGE_CONTENT = 140000;
 
-struct diskManpage { //struct que vai ser gravada em disco, nos registros
+
+/**
+ * Objeto que será gravado no disco.
+ * Contém o nome do comando e o seu conteudo em texto.
+ */
+struct diskManpage {
 	char name[MAX_MANPAGE_NAME_SIZE];
 	char content[MAX_MANPAGE_CONTENT];
 
@@ -27,7 +32,6 @@ struct diskManpage { //struct que vai ser gravada em disco, nos registros
 		strcpy(this->content, content);
 	}
 };
-
 
 
 class Database {
@@ -40,12 +44,17 @@ public:
 	vector<string> contentQuery(string word);
 
 private:
-	AVLTree<string> primaryIndex; //AVLTree<string, Manpage*> na verdade o Manpage* é o "endereco" do inicio da manpage no registro
-	AVLTree<string> secondaryIndex; //AVLTree<string, list<Manpage*>>
+	PrimaryTree primaryIndex;
+	SecundaryTree secondaryIndex;
 	std::string manpageRecordFileName_;
 	std::string invertedListRecordFileName_;
 	int invertedListIndex;
 	int manpageIndex;
+
+
+	void writeRecord(diskManpage manpage, string fileName, int index);
+	diskManpage readRecord(string fileName,int recordIndex);
+	string readName(string fileName,int recordIndex);
 };
 
 
