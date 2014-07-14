@@ -14,6 +14,15 @@
 
 #include "AvlTree.h"
 
+struct StringTreeUnion {
+
+	StringTreeUnion(std::string string, AvlTree *tree) : string(string), tree(tree) {
+	}
+
+	std::string string;
+	AvlTree *tree;
+};
+
 class SecundaryTree {
 
 	struct Node {
@@ -50,8 +59,8 @@ class SecundaryTree {
 			}
 		}
 
-		int operator*() {
-			return current->manpage_indexes;
+		StringTreeUnion operator*() {
+			return StringTreeUnion(current->key, current->manpage_indexes);
 		}
 
 		iterator_base& operator++() {
@@ -115,6 +124,16 @@ public:
 	size_t size() const;
 	size_t greatestListSize() const;
 
+	typedef iterator_base iterator;
+
+	iterator begin() {
+		return iterator(root_);
+	}
+
+	iterator end() {
+		return iterator(0);
+	}
+
 private:
 	Node *root_;
 	size_t size_;
@@ -134,5 +153,7 @@ private:
 
 
 };
+
+
 
 #endif /* SecundaryTree_H_ */

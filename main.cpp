@@ -14,6 +14,7 @@
 #include "Manpage.h"
 #include "Database.h"
 #include "QueryException.h"
+#include "SecundaryTree.h"
 
 using namespace std;
 
@@ -168,8 +169,8 @@ void console() {
 		cout << "Opcoes:" << endl;
 		cout << "1) Fazer uma pesquisa por nome da manpage." << endl;
 		cout
-				<< "2) Fazer uma pesquisa por manpage contendo uma palavra expecifica"
-				<< endl;
+		<< "2) Fazer uma pesquisa por manpage contendo uma palavra expecifica"
+		<< endl;
 		cout << "3) Fazer uma pesquisa por manpage contendo diversas palavras"
 				<< endl;
 		getline(cin, input);
