@@ -18,7 +18,6 @@
 const int MAX_MANPAGE_NAME_SIZE = 53; //estes numeros foram obtidos a partir de testes nas manpages
 const int MAX_MANPAGE_CONTENT = 140000;
 
-
 /**
  * Objeto que será gravado no disco.
  * Contém o nome do comando e o seu conteudo em texto.
@@ -33,29 +32,30 @@ struct diskManpage {
 	}
 };
 
-
 class Database {
 public:
 	Database(std::string manpageRecordFileName, std::string invertedListRecordFileName);
 	~Database();
 
-	void insert(const Manpage& manpage, const diskManpage& disk);
+	void insert(string filename);
 	diskManpage nameQuery(const string& name) const;
-	vector<string> contentQuery(const string& word) const;
-	vector<string> multipleContentQuery(const string& word1, const string& word2) const;
+	deque<string> contentQuery(const string& word) const;
+	deque<string> multipleContentQuery(const string& word1, const string& word2) const;
 	void clear();
 
 private:
+	//variaveis
 	PrimaryTree primaryIndex;
 	SecundaryTree secondaryIndex;
 	std::string manpageRecordFileName_;
 	std::string invertedListRecordFileName_;
 	int manpageIndex_;
 
-
+	//metodos
 	void writeRecord(diskManpage manpage, string fileName, int index);
 	diskManpage readRecord(string fileName,int recordIndex) const;
 	string readName(string fileName,int recordIndex) const;
+	string removeExtension(string name);
 };
 
 

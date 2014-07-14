@@ -9,6 +9,7 @@
 #include <iostream> //cout
 #include <fstream> //file stream
 #include <deque>
+#include <sstream>
 
 #include "Database.h"
 #include "AvlTree.h"
@@ -22,8 +23,9 @@ using namespace std;
  */
 Database::Database(string manpageRecordFileName,
 		string invertedListRecordFileName) :
-				primaryIndex(), secondaryIndex(), manpageRecordFileName_(
-						manpageRecordFileName), invertedListRecordFileName_(invertedListRecordFileName), manpageIndex_(0) {
+		primaryIndex(), secondaryIndex(), manpageRecordFileName_(
+				manpageRecordFileName), invertedListRecordFileName_(
+				invertedListRecordFileName), manpageIndex_(0) {
 }
 
 Database::~Database() {
@@ -32,15 +34,28 @@ Database::~Database() {
 /**
  * Adiciona uma manpage no banco de dados
  * Isso inclui sua indexacao primaria(pelo seu nome) e secundaria(por todas as palavras que ela contem)
- *
- * @param manpage a ser adicionada no banco de dados
- * @param diskManpage a ser adicionada nos registros
+ * @param Nome do arquivo da manpage a ser adicionada no banco de dados
  */
-void Database::insert(const Manpage& manpage, const diskManpage& disk) {
+void Database::insert(string filename) {
+	deque<string> words;
+	string concatenated(""), actual;
+	ifstream file(filename.c_str());
+
+	while (getline(file, actual)) {
+		concatenated += actual + "\n";
+		stringstream line(actual);
+
+		while (line >> actual) {
+			words.push_back(actual);
+		}
+	}
+	filename = removeExtension(filename);
+	Manpage manpage(filename, words);
+	diskManpage disk(filename.c_str(), concatenated.c_str());
+
 	writeRecord(disk, manpageRecordFileName_, manpageIndex_);
 	primaryIndex.insert(manpage.name(), manpageIndex_);
 
-	vector<string> words = manpage.words();
 	for (size_t i = 0; i < words.size(); ++i) { //adicionar todas as palavras do conteudo na indexacao secundaria
 		secondaryIndex.insert(words[i], manpageIndex_);
 	}
@@ -52,7 +67,7 @@ void Database::insert(const Manpage& manpage, const diskManpage& disk) {
  * @param nome da manpage a ser procurada
  * @return manpage com o nome recebido
  */
-diskManpage Database::nameQuery(const string& name) const{
+diskManpage Database::nameQuery(const string& name) const {
 	int position = primaryIndex.search(name);
 	return readRecord(manpageRecordFileName_, position);
 }
@@ -61,9 +76,9 @@ diskManpage Database::nameQuery(const string& name) const{
  * @param palavra que se deseja encontrar nas manpages
  * @return lista dos nomes das manpages que contem esta palavra
  */
-vector<string> Database::contentQuery(const string& word) const{
+deque<string> Database::contentQuery(const string& word) const {
 	AvlTree *tree = secondaryIndex.search(word);
-	vector<string> ret;
+	deque<string> ret;
 	for (AvlTree::iterator it = tree->begin(); it != tree->end(); ++it) {
 		ret.push_back(readName(manpageRecordFileName_, *it));
 	}
@@ -76,11 +91,9 @@ vector<string> Database::contentQuery(const string& word) const{
  * @param Palavra 1 que também se quer encontrar manpages que contenham
  * @return vetor contendo o nome de todas as manpages que contem ambas as palavras
  */
-vector<string> Database::multipleContentQuery(const string& first, const string& second) const{
-
-
-
-	vector<string> ret;
+deque<string> Database::multipleContentQuery(const string& first,
+		const string& second) const {
+	deque<string> ret;
 	AvlTree *lesser = secondaryIndex.search(first);
 	AvlTree *greater = secondaryIndex.search(second);
 
@@ -93,7 +106,6 @@ vector<string> Database::multipleContentQuery(const string& first, const string&
 			ret.push_back(readName(manpageRecordFileName_, *it));
 		}
 	}
-
 
 	return ret;
 }
@@ -134,7 +146,7 @@ void Database::writeRecord(diskManpage manpage, string fileName, int index) {
  * @param A posicao do registro que sera lido
  * @return diskManpage lido da posicao recordIndex
  */
-diskManpage Database::readRecord(string fileName, int recordIndex) const{
+diskManpage Database::readRecord(string fileName, int recordIndex) const {
 	ifstream input(fileName.c_str(), ios::in | ios::binary);
 
 	if (!input) {
@@ -155,7 +167,7 @@ diskManpage Database::readRecord(string fileName, int recordIndex) const{
  * @param a posicao do registro que sera lido
  * @return nome do comando na posicao recordIndex
  */
-string Database::readName(string fileName, int recordIndex) const{
+string Database::readName(string fileName, int recordIndex) const {
 	ifstream input(fileName.c_str(), ios::in | ios::binary);
 
 	if (!input) {
@@ -168,6 +180,20 @@ string Database::readName(string fileName, int recordIndex) const{
 
 	input.read(name, MAX_MANPAGE_NAME_SIZE);
 
-
 	return name;
+}
+
+/**
+ * Retira tudo que vem depois do ultimo ponto de uma string
+ * @param Palavra que se quer tirar a extensao
+ * @return A palavra sem extensao
+ */
+string Database::removeExtension(string name) {
+	int i = name.length() - 1;
+	for (; i >= 0; --i) {
+		if (name[i] == '.') {
+			break;
+		}
+	}
+	return name.substr(0, i);
 }

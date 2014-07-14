@@ -9,22 +9,22 @@
 #define MANPAGE_H_
 
 #include <string>
-#include <vector>
+#include <deque>
 
 using namespace std;
 
 class Manpage {
 public:
-	Manpage(string name, vector<string> words);
+	Manpage(string name, deque<string> words);
 	Manpage(const Manpage& manpage);
 	~Manpage();
 
 	string name() const;
-	vector<string> words() const;
+	deque<string> words() const;
 
 private:
 	string name_;
-	vector<string> words_;
+	deque<string> words_;
 };
 
 #endif /* MANPAGE_H_ */

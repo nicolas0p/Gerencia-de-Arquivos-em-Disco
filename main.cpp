@@ -19,20 +19,9 @@
 using namespace std;
 
 /**
- * Retira tudo que vem depois do ultimo ponto de uma string
- * @param Palavra que se quer tirar a extensao
- * @return A palavra sem extensao
+ * Console de pesquisa por nome da manpage
+ * @param Database onde será feita a pesquisa por nome
  */
-string removeExtension(string name) {
-	int i = name.length() - 1;
-	for (; i >= 0; --i) {
-		if (name[i] == '.') {
-			break;
-		}
-	}
-	return name.substr(0, i);
-}
-
 void pesquisaNome(Database& database) {
 	string input;
 	while (true) {
@@ -50,6 +39,10 @@ void pesquisaNome(Database& database) {
 	cout << result.content << endl;
 }
 
+/**
+ * Console de pesquisa por conteudo em manpages
+ * @param Database onde será feita a pesquisa
+ */
 void pesquisaConteudo(const Database& database) {
 	string input;
 	while (true) {
@@ -59,7 +52,7 @@ void pesquisaConteudo(const Database& database) {
 		if (input.length() > 0)
 			break;
 	}
-	vector<string> result;
+	deque<string> result;
 	try {
 		result = database.contentQuery(input);
 	} catch (QueryException& e) {
@@ -77,6 +70,10 @@ void pesquisaConteudo(const Database& database) {
 	cout << endl;
 }
 
+/**
+ * Console para pesquisa por duas palavras contendo nas manpages
+ * @param database onde a pesquisa será feita
+ */
 void pesquisaMultiplosConteudos(const Database& database) {
 	string input;
 	int quant = 2;
@@ -90,7 +87,7 @@ void pesquisaMultiplosConteudos(const Database& database) {
 		}
 		words.push_back(input);
 	}
-	vector<string> result;
+	deque<string> result;
 	try {
 		result = database.multipleContentQuery(words[0], words[1]);
 	} catch (QueryException& e) {
@@ -108,7 +105,7 @@ void pesquisaMultiplosConteudos(const Database& database) {
 }
 
 /**
- * retorna a posicao do elemento searched no array
+ * retorna a posicao do elemento searched no array por busca binaria
  */
 int search(int* array, int searched, int left, int right) {
 	int middle = (right + left) / 2;
@@ -124,28 +121,18 @@ int search(int* array, int searched, int left, int right) {
 }
 
 /**
- * Escreve os arquivos recebidos de parametro na execussao do programa
+ * Escreve os arquivos recebidos de parametro na execucao do programa
  * @param numero de argumentos
  * @param array de argumentos
  * @param Database onde sera adicionados as manpages
  */
 void indexFiles(int argc, char** argv, Database& database) {
-	vector<string> words;
+	int i = 0;
 	for (--argc; argc > 0; --argc) { //argv[0] é o nome do nosso comando
 		string filename = argv[argc];
-		string concatenated(""), actual;
-		ifstream file(filename.c_str());
-
-		while (getline(file, actual)) {
-			concatenated += actual + "\n";
-			stringstream line(actual);
-
-			while (line >> actual) {
-				words.push_back(actual);
-			}
-		}
-		filename = removeExtension(filename);
-		database.insert(Manpage(filename, words),diskManpage(filename.c_str(),concatenated.c_str()));
+		database.insert(filename);
+		cout << "Arquivo-" << i << " "<< filename << " lido" << endl;
+		++i;
 	}
 }
 

@@ -98,20 +98,6 @@ vector<string> connectives() {
 			"several" )).push_back(string ( "all" )).push_back(string ( "any" )).push_back(
 			string ( "most" )).push_back(string ( "none" )).push_back(string (
 			"some" ));
-
-// reflexive pronouns
-	connectives.push_back(string ( "myself" )).push_back(string ( "ourselves" )).push_back(
-			string ( "yourself" )).push_back(string ( "yourselves" )).push_back(
-			string ( "himself" )).push_back(string ( "herself" )).push_back(
-			string ( "itself" )).push_back(string ( "themselves" ));
-
-// possessive pronouns (except her)
-	connectives.push_back(string ( "my" )).push_back(string ( "your" )).push_back(
-			string ( "his" )).push_back(string ( "its" )).push_back(string (
-			"our" )).push_back(string ( "your" )).push_back(string ( "their" )).push_back(
-			string ( "mine" )).push_back(string ( "yours" )).push_back(string (
-			"his" )).push_back(string ( "hers" )).push_back(string ( "ours" )).push_back(
-			string ( "yours" )).push_back(string ( "theirs" ));
 	return connectives;
 }
 
