@@ -107,6 +107,7 @@ public:
 	virtual ~AvlTree();
 	void insert(int);
 	void erase(int);
+	bool search (int) const;
 	size_t size() const;
 
 	typedef iterator_base iterator;
@@ -125,6 +126,7 @@ private:
 
 	Node* insert(Node*, int);
 	Node* erase(Node*, int);
+	bool search(Node*, int) const;
 
 	Node* simpleRight(Node*);
 	Node* simpleLeft(Node*);

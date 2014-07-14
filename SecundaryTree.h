@@ -119,7 +119,7 @@ public:
 	virtual ~SecundaryTree();
 	void insert(const std::string&, int);
 	void erase(const std::string&);
-	AvlTree search(const std::string&) const;
+	AvlTree* search(const std::string&) const;
 	size_t size() const;
 	size_t greatestListSize() const;
 

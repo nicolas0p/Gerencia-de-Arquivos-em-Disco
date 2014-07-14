@@ -22,8 +22,8 @@ using namespace std;
  */
 Database::Database(string manpageRecordFileName,
 		string invertedListRecordFileName) :
-		primaryIndex(), secondaryIndex(), manpageRecordFileName_(
-				manpageRecordFileName), invertedListRecordFileName_(invertedListRecordFileName), manpageIndex_(0) {
+				primaryIndex(), secondaryIndex(), manpageRecordFileName_(
+						manpageRecordFileName), invertedListRecordFileName_(invertedListRecordFileName), manpageIndex_(0) {
 }
 
 Database::~Database() {
@@ -62,9 +62,9 @@ diskManpage Database::nameQuery(const string& name) const{
  * @return lista dos nomes das manpages que contem esta palavra
  */
 vector<string> Database::contentQuery(const string& word) const{
-	AvlTree tree = secondaryIndex.search(word);
+	AvlTree *tree = secondaryIndex.search(word);
 	vector<string> ret;
-	for (AvlTree::iterator it = tree.begin(); it != tree.end(); ++it) {
+	for (AvlTree::iterator it = tree->begin(); it != tree->end(); ++it) {
 		ret.push_back(readName(manpageRecordFileName_, *it));
 	}
 	return ret;
@@ -78,21 +78,17 @@ vector<string> Database::contentQuery(const string& word) const{
  */
 vector<string> Database::multipleContentQuery(const string& word1, const string& word2) const{
 	vector<string> ret;
-	AvlTree lesser = secondaryIndex.search(word1);
-	AvlTree greater = secondaryIndex.search(word2);
-
-	if (greater.size() < lesser.size()) {
+	AvlTree *lesser = secondaryIndex.search(word1);
+	AvlTree *greater = secondaryIndex.search(word2);
+	if (greater->size() < lesser->size()) {
 		swap(greater, lesser);
 	}
 
-	for (AvlTree::iterator it = lesser.begin(); it != lesser.end(); ++it) {
-		for (AvlTree::iterator that = greater.begin(); that != greater.end(); ++that)
-			if (*it == *that) {
-				string toAdd = readName(manpageRecordFileName_, *it);
-				ret.push_back(toAdd);
-			}
+	for (AvlTree::iterator it = lesser->begin(); it != lesser->end(); ++it) {
+		if (greater->search(*it)) {
+			ret.push_back(readName(manpageRecordFileName_, *it));
+		}
 	}
-
 	return ret;
 }
 /**

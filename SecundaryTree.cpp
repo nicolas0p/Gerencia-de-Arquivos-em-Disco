@@ -107,8 +107,8 @@ SecundaryTree::Node* SecundaryTree::erase(Node* node, const std::string &string)
 	return returned;
 }
 
-AvlTree SecundaryTree::search(const std::string &string) const{
-	return *(search(root_, string));
+AvlTree* SecundaryTree::search(const std::string &string) const {
+	return search(root_, string);
 }
 
 AvlTree* SecundaryTree::search(Node *node, const std::string &string) const{

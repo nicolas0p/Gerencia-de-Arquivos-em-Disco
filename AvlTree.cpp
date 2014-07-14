@@ -107,6 +107,22 @@ AvlTree::Node* AvlTree::erase(Node* node, int element) { //TODO
 	return returned;
 }
 
+bool AvlTree::search(int element) const {
+	return search(root, element);
+}
+
+bool AvlTree::search(Node *node, int element) const {
+	if (node == 0) {
+		return false;
+	} else if (element > node->_data) {
+		return search(node->_right, element);
+	} else if (element < node->_data) {
+		return search(node->_left, element);
+	} else {
+		return true;
+	}
+}
+
 AvlTree::Node* AvlTree::simpleRight(Node* upper) {
 	Node *left = upper->_left;
 	upper->_left = left->_right;
