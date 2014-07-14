@@ -94,7 +94,9 @@ vector<string> Database::multipleContentQuery(string word1, string word2) {
 
 	return ret;
 }
-
+/**
+ * Deleta os arquivos de indice primário e secundário do disco
+ */
 void Database::clear() {
 	ofstream manpage(manpageRecordFileName_.c_str(), ios::trunc);
 	ofstream inverted(invertedListRecordFileName_.c_str(), ios::trunc);
@@ -103,6 +105,7 @@ void Database::clear() {
 /**
  *	Escreve um registro na posicao index
  *	@param manpage a ser escrita em disco
+ *	@param nome do arquivo onde a manpage será escrita
  *	@param posicao relativa do arquivo no arquivo de manpages
  */
 void Database::writeRecord(diskManpage manpage, string fileName, int index) {
@@ -113,7 +116,7 @@ void Database::writeRecord(diskManpage manpage, string fileName, int index) {
 		return;
 	}
 
-	if (index != -1) {
+	if (index > -1) {
 		output.seekp(streampos(index * sizeof(diskManpage)));
 	}
 
@@ -123,8 +126,9 @@ void Database::writeRecord(diskManpage manpage, string fileName, int index) {
 }
 
 /**
- * Le um registro de manpage do arquivo FILE_NAME na posicao recordIndex
- * @param a posicao do registro que sera lido
+ * Le um registro de manpage do arquivo fileName na posicao recordIndex
+ * @param O nome do arquivo que se deseja ler
+ * @param A posicao do registro que sera lido
  * @return diskManpage lido da posicao recordIndex
  */
 diskManpage Database::readRecord(string fileName, int recordIndex) {
@@ -144,6 +148,7 @@ diskManpage Database::readRecord(string fileName, int recordIndex) {
 
 /**
  * Le o nome do comando na posicao recordIndex
+ * @param O nome do arquivo que se deseja ler
  * @param a posicao do registro que sera lido
  * @return nome do comando na posicao recordIndex
  */

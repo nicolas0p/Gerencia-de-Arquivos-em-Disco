@@ -14,16 +14,19 @@
 
 class PrimaryTree {
 
-	struct Node {
-		Node(Node *left, Node *right, std::string key, int manpage_index) :
-			left(left), right(right), height(0), key(key), manpage_index(manpage_index) {
-		}
+	friend class PrimaryDiskTree;
 
-		Node *left, *right;
-		int height;
-		std::string key;
-		int manpage_index;
-	};
+	struct Node {
+			Node(Node *left, Node *right, std::string key, int manpage_index) :
+					left(left), right(right), height(0), key(key), manpage_index(
+							manpage_index) {
+			}
+
+			Node *left, *right;
+			int height;
+			std::string key;
+			int manpage_index;
+		};
 
 public:
 	PrimaryTree();
@@ -32,8 +35,6 @@ public:
 	void erase(std::string);
 	size_t size() const;
 	int search(std::string);
-
-	void writeToFile(std::string filename);
 
 private:
 	Node *root_;
