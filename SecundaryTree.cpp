@@ -107,11 +107,11 @@ SecundaryTree::Node* SecundaryTree::erase(Node* node, const std::string &string)
 	return returned;
 }
 
-AvlTree SecundaryTree::search(const std::string &string) {
+AvlTree SecundaryTree::search(const std::string &string) const{
 	return *(search(root_, string));
 }
 
-AvlTree* SecundaryTree::search(Node *node, const std::string &string) {
+AvlTree* SecundaryTree::search(Node *node, const std::string &string) const{
 	if (node == 0) {
 		throw QueryException();
 	} else if (string > node->key) {
@@ -163,7 +163,7 @@ void SecundaryTree::deleteTree(Node *node) {
 	}
 }
 
-int SecundaryTree::height(Node *node) {
+int SecundaryTree::height(Node *node) const{
 	if (node == 0) {
 		return -1;
 	}

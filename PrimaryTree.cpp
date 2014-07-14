@@ -114,7 +114,8 @@ int PrimaryTree::search(std::string string) const {
 	return search(root_, string);
 }
 
-int PrimaryTree::search(Node *node, std::string string) const {
+int PrimaryTree::search(Node *node, std::string string) const{
+
 	if (node == 0) {
 		throw QueryException();
 	} else if (string > node->key) {

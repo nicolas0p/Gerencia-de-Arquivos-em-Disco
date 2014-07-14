@@ -40,9 +40,9 @@ public:
 	~Database();
 
 	void insert(const Manpage& manpage, const diskManpage& disk);
-	diskManpage nameQuery(string name);
-	vector<string> contentQuery(string word);
-	vector<string> multipleContentQuery(string word1, string word2);
+	diskManpage nameQuery(const string& name) const;
+	vector<string> contentQuery(const string& word) const;
+	vector<string> multipleContentQuery(const string& word1, const string& word2) const;
 	void clear();
 
 private:
@@ -54,8 +54,8 @@ private:
 
 
 	void writeRecord(diskManpage manpage, string fileName, int index);
-	diskManpage readRecord(string fileName,int recordIndex);
-	string readName(string fileName,int recordIndex);
+	diskManpage readRecord(string fileName,int recordIndex) const;
+	string readName(string fileName,int recordIndex) const;
 };
 
 

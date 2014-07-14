@@ -52,7 +52,7 @@ void Database::insert(const Manpage& manpage, const diskManpage& disk) {
  * @param nome da manpage a ser procurada
  * @return manpage com o nome recebido
  */
-diskManpage Database::nameQuery(string name) {
+diskManpage Database::nameQuery(const string& name) const{
 	int position = primaryIndex.search(name);
 	return readRecord(manpageRecordFileName_, position);
 }
@@ -61,7 +61,7 @@ diskManpage Database::nameQuery(string name) {
  * @param palavra que se deseja encontrar nas manpages
  * @return lista dos nomes das manpages que contem esta palavra
  */
-vector<string> Database::contentQuery(string word) {
+vector<string> Database::contentQuery(const string& word) const{
 	AvlTree tree = secondaryIndex.search(word);
 	vector<string> ret;
 	for (AvlTree::iterator it = tree.begin(); it != tree.end(); ++it) {
@@ -76,7 +76,7 @@ vector<string> Database::contentQuery(string word) {
  * @param Palavra 1 que também se quer encontrar manpages que contenham
  * @return vetor contendo o nome de todas as manpages que contem ambas as palavras
  */
-vector<string> Database::multipleContentQuery(string word1, string word2) {
+vector<string> Database::multipleContentQuery(const string& word1, const string& word2) const{
 	vector<string> ret;
 	AvlTree lesser = secondaryIndex.search(word1);
 	AvlTree greater = secondaryIndex.search(word2);
@@ -132,7 +132,7 @@ void Database::writeRecord(diskManpage manpage, string fileName, int index) {
  * @param A posicao do registro que sera lido
  * @return diskManpage lido da posicao recordIndex
  */
-diskManpage Database::readRecord(string fileName, int recordIndex) {
+diskManpage Database::readRecord(string fileName, int recordIndex) const{
 	ifstream input(fileName.c_str(), ios::in | ios::binary);
 
 	if (!input) {
@@ -153,7 +153,7 @@ diskManpage Database::readRecord(string fileName, int recordIndex) {
  * @param a posicao do registro que sera lido
  * @return nome do comando na posicao recordIndex
  */
-string Database::readName(string fileName, int recordIndex) {
+string Database::readName(string fileName, int recordIndex) const{
 	ifstream input(fileName.c_str(), ios::in | ios::binary);
 
 	if (!input) {

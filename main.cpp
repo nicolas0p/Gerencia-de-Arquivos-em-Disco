@@ -107,12 +107,13 @@ void pesquisaMultiplosConteudos(Database database) {
 /**
  * Adiciona todas as manpages ao banco de dados
  */
+
 int main(int argc, char** argv) {
 	Database database("manpages.dat", "invertedLists.dat");
 
 	vector<string> words;
 	for (--argc; argc > 0; --argc) { //argv[0] é o nome do nosso comando
-		string filename = clearExtension(argv[argc]);
+		string filename = argv[argc];
 		string concatenated(""), actual;
 		ifstream file(filename.c_str());
 		while (getline(file, actual)) {
@@ -122,17 +123,14 @@ int main(int argc, char** argv) {
 				words.push_back(actual);
 			}
 		}
-		database.insert(Manpage(filename, words),
-				diskManpage(filename.c_str(), concatenated.c_str()));
+		database.insert(Manpage(clearExtension(filename), words), diskManpage(clearExtension(filename).c_str(), concatenated.c_str()));
 	}
 
-	string word("and");
-
+	diskManpage result = database.nameQuery("cd.1");
+	//for(size_t i = 0 ; i < result.size(); ++i) {
+		cout << result.name << endl;
 }
 
-void menu() {
-
-}
 /**
  * retorna a posicao do elemento searched no array
  */
