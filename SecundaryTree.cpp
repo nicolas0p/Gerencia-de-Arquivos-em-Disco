@@ -10,7 +10,7 @@
 
 #include "SecundaryTree.h"
 #include "QueryException.h"
-
+#include "AvlTree.h"
 
 SecundaryTree::SecundaryTree() : root_(0), size_(0) {}
 
@@ -18,15 +18,11 @@ SecundaryTree::~SecundaryTree() {
 	deleteTree(root_);
 }
 
-size_t SecundaryTree::size() const {
-	return size_;
-}
-
-void SecundaryTree::insert(std::string string, int index) {
+void SecundaryTree::insert(const std::string &string, int index) {
 	root_ = insert(root_, string, index);
 }
 
-SecundaryTree::Node* SecundaryTree::insert(Node *node, std::string string, int index) {
+SecundaryTree::Node* SecundaryTree::insert(Node *node, const std::string &string, int index) {
 	if (node == 0) {
 		node = new Node(0, 0, string, index);
 		++size_;
@@ -49,17 +45,17 @@ SecundaryTree::Node* SecundaryTree::insert(Node *node, std::string string, int i
 			}
 		}
 	} else { //manpage == node->key
-		node->manpage_indexes->push_back(index);
+		node->manpage_indexes->insert(index);
 	}
 	node->height = std::max(height(node->left), height(node->right)) + 1;
 	return node;
 }
 
-void SecundaryTree::erase(std::string string) {
+void SecundaryTree::erase(const std::string &string) {
 	root_ = erase(root_, string);
 }
 
-SecundaryTree::Node* SecundaryTree::erase(Node* node, std::string string) {
+SecundaryTree::Node* SecundaryTree::erase(Node* node, const std::string &string) {
 	Node *returned = node;
 	if (node == 0) {
 		return 0;
@@ -88,7 +84,7 @@ SecundaryTree::Node* SecundaryTree::erase(Node* node, std::string string) {
 		}
 		node->key = min->key;
 		delete node->manpage_indexes;
-		node->manpage_indexes = new std::deque<int>(*(min->manpage_indexes)); //faz copia da lista, pois a lista sera deletada
+		node->manpage_indexes = new AvlTree(*(min->manpage_indexes)); //faz copia da lista, pois a lista sera deletada
 		node->right = erase(node->right, min->key);
 		if (height(node->left) - height(node->right) == 2) {
 			if (height(node->right->left) - height (node->right->right) >= 0) {
@@ -111,11 +107,11 @@ SecundaryTree::Node* SecundaryTree::erase(Node* node, std::string string) {
 	return returned;
 }
 
-std::deque<int> SecundaryTree::search(std::string string) {
+AvlTree SecundaryTree::search(const std::string &string) {
 	return *(search(root_, string));
 }
 
-std::deque<int>* SecundaryTree::search(Node *node, std::string string) {
+AvlTree* SecundaryTree::search(Node *node, const std::string &string) {
 	if (node == 0) {
 		throw QueryException();
 	} else if (string > node->key) {
@@ -172,4 +168,19 @@ int SecundaryTree::height(Node *node) {
 		return -1;
 	}
 	return node->height;
+}
+
+size_t SecundaryTree::size() const {
+	return size_;
+}
+
+size_t SecundaryTree::greatestListSize() const {
+	return greatestListSize(root_);
+}
+
+size_t SecundaryTree::greatestListSize(Node *node) const {
+	if (node == 0) {
+		return 0;
+	}
+	return std::max(std::max(node->manpage_indexes->size(), greatestListSize(node->left)), greatestListSize(node->right));
 }
