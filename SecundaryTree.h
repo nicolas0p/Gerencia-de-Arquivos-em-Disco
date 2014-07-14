@@ -35,7 +35,6 @@ class SecundaryTree {
 			delete manpage_indexes;
 		}
 
-
 		Node *left, *right;
 		int height;
 		std::string key;
@@ -120,7 +119,7 @@ public:
 	virtual ~SecundaryTree();
 	void insert(const std::string&, int);
 	void erase(const std::string&);
-	AvlTree search(const std::string&);
+	AvlTree search(const std::string&) const;
 	size_t size() const;
 	size_t greatestListSize() const;
 
@@ -140,18 +139,16 @@ private:
 
 	Node* insert(Node*, const std::string&, int);
 	Node* erase(Node*, const std::string&);
-	AvlTree* search(Node*, const std::string&);
+	AvlTree* search(Node*, const std::string&) const;
 
 	Node* simpleRight(Node*);
 	Node* simpleLeft(Node*);
 	Node* doubleRight(Node*);
 	Node* doubleLeft(Node*);
 
-	int height(Node*);
+	int height(Node*) const;
 	size_t greatestListSize(Node *) const;
 	void deleteTree(Node *);
-
-
 };
 
 

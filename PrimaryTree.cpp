@@ -110,11 +110,11 @@ PrimaryTree::Node* PrimaryTree::erase(Node* node, std::string string) {
 	return returned;
 }
 
-int PrimaryTree::search(std::string string) {
+int PrimaryTree::search(std::string string) const {
 	return search(root_, string);
 }
 
-int PrimaryTree::search(Node *node, std::string string) {
+int PrimaryTree::search(Node *node, std::string string) const {
 	if (node == 0) {
 		throw QueryException();
 	} else if (string > node->key) {
@@ -164,7 +164,7 @@ void PrimaryTree::deleteTree(Node *node) {
 	}
 }
 
-int PrimaryTree::height(Node *node) {
+int PrimaryTree::height(Node *node) const {
 	if (node == 0) {
 		return -1;
 	}

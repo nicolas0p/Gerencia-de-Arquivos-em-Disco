@@ -131,7 +131,7 @@ private:
 	Node* doubleRight(Node*);
 	Node* doubleLeft(Node*);
 
-	int height(Node*);
+	int height(Node*) const;
 	void deleteTree(Node *node);
 };
 

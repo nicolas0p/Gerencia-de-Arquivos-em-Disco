@@ -114,7 +114,7 @@ public:
 	void insert(std::string, int);
 	void erase(std::string);
 	size_t size() const;
-	int search(std::string);
+	int search(std::string) const;
 
 	typedef iterator_base iterator;
 
@@ -132,14 +132,14 @@ private:
 
 	Node* insert(Node*, std::string, int);
 	Node* erase(Node*, std::string);
-	int search(Node*, std::string);
+	int search(Node*, std::string) const;
 
 	Node* simpleRight(Node*);
 	Node* simpleLeft(Node*);
 	Node* doubleRight(Node*);
 	Node* doubleLeft(Node*);
 
-	int height(Node*);
+	int height(Node*) const;
 	void deleteTree(Node *node);
 };
 

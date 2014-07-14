@@ -145,7 +145,7 @@ void AvlTree::deleteTree(Node *node) {
 	}
 }
 
-int AvlTree::height(Node *node) {
+int AvlTree::height(Node *node) const {
 	if (node == 0) {
 		return -1;
 	}
