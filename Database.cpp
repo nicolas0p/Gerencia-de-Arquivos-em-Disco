@@ -76,19 +76,25 @@ vector<string> Database::contentQuery(const string& word) const{
  * @param Palavra 1 que também se quer encontrar manpages que contenham
  * @return vetor contendo o nome de todas as manpages que contem ambas as palavras
  */
-vector<string> Database::multipleContentQuery(const string& word1, const string& word2) const{
+vector<string> Database::multipleContentQuery(const string& first, const string& second) const{
+
+
+
 	vector<string> ret;
-	AvlTree *lesser = secondaryIndex.search(word1);
-	AvlTree *greater = secondaryIndex.search(word2);
+	AvlTree *lesser = secondaryIndex.search(first);
+	AvlTree *greater = secondaryIndex.search(second);
+
 	if (greater->size() < lesser->size()) {
 		swap(greater, lesser);
 	}
-
+	//cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;
 	for (AvlTree::iterator it = lesser->begin(); it != lesser->end(); ++it) {
 		if (greater->search(*it)) {
 			ret.push_back(readName(manpageRecordFileName_, *it));
 		}
 	}
+
+
 	return ret;
 }
 /**

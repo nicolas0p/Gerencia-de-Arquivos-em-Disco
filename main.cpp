@@ -23,7 +23,7 @@ using namespace std;
  * @param Palavra que se quer tirar a extensao
  * @return A palavra sem extensao
  */
-string clearExtension(string name) {
+string removeExtension(string name) {
 	int i = name.length() - 1;
 	for (; i >= 0; --i) {
 		if (name[i] == '.') {
@@ -33,7 +33,7 @@ string clearExtension(string name) {
 	return name.substr(0, i);
 }
 
-void pesquisaNome(Database database) {
+void pesquisaNome(Database& database) {
 	string input;
 	while (true) {
 		cout << "Deseja pesquisar por qual manpage?" << endl;
@@ -50,11 +50,12 @@ void pesquisaNome(Database database) {
 	cout << result.content << endl;
 }
 
-void pesquisaConteudo(Database database) {
+void pesquisaConteudo(const Database& database) {
 	string input;
 	while (true) {
 		cout << "Deseja pesquisar por qual palavra?" << endl;
 		getline(cin, input);
+
 		if (input.length() > 0)
 			break;
 	}
@@ -72,63 +73,38 @@ void pesquisaConteudo(Database database) {
 			cout << endl;
 		}
 	}
+
+	cout << endl;
 }
 
-void pesquisaMultiplosConteudos(Database database) {
+void pesquisaMultiplosConteudos(const Database& database) {
 	string input;
-	int quant;
+	int quant = 2;
 	deque<string> words;
-	while (true) {
-		cout << "Deseja pequisar por quantas palavras?" << endl;
-		getline(cin, input);
-		stringstream nro(input);
-		nro >> quant;
-		if (quant > 0)
-			break;
-		cout << "Opcao invalida. Digite um numero positivo." << endl;
-	}
-	for(; quant > 0; --quant) {
-		while(true) {
+	for (; quant > 0; --quant) {
+		while (true) {
 			cout << "Digite a palavra que deseja:" << endl;
 			getline(cin, input);
-			if(input.length() > 0)
+			if (input.length() > 0)
 				break;
 		}
 		words.push_back(input);
 	}
 	vector<string> result;
 	try {
-		//result = database.multipleContentQuery();
-	} catch(QueryException& e) {
+		result = database.multipleContentQuery(words[0], words[1]);
+	} catch (QueryException& e) {
 		cout << "Nenhuma manpage contem todas estas palavras!" << endl;
+		return;
 	}
-}
-
-/**
- * Adiciona todas as manpages ao banco de dados
- */
-
-int main(int argc, char** argv) {
-	Database database("manpages.dat", "invertedLists.dat");
-
-	vector<string> words;
-	for (--argc; argc > 0; --argc) { //argv[0] é o nome do nosso comando
-		string filename = argv[argc];
-		string concatenated(""), actual;
-		ifstream file(filename.c_str());
-		while (getline(file, actual)) {
-			concatenated += actual + "\n";
-			stringstream line(actual);
-			while (line >> actual) {
-				words.push_back(actual);
-			}
+	cout << "Manpages que contem as duas palavra:" << endl;
+	for (size_t i = 0; i < result.size(); ++i) {
+		cout << result[i] << "	";
+		if (i % 4 == 3) { //mostra 4 manpages por linha
+			cout << endl;
 		}
-		database.insert(Manpage(clearExtension(filename), words), diskManpage(clearExtension(filename).c_str(), concatenated.c_str()));
 	}
-
-	diskManpage result = database.nameQuery("cd.1");
-	//for(size_t i = 0 ; i < result.size(); ++i) {
-		cout << result.name << endl;
+	cout << endl;
 }
 
 /**
@@ -138,23 +114,51 @@ int search(int* array, int searched, int left, int right) {
 	int middle = (right + left) / 2;
 	if (searched == array[middle])
 		return middle;
-	if (searched > array[right - left]) {
-		return search(array, searched, right - left, right);
+	if (searched > array[middle]) {
+		return search(array, searched, middle, right);
 	} else {
-		return search(array, searched, left, right - left);
+		return search(array, searched, left, middle);
 	}
 	if (left == right)
 		return -1;
 }
 
-void console() {
-	Database database("manpages.dat", "invertedLists.dat");
+/**
+ * Escreve os arquivos recebidos de parametro na execussao do programa
+ * @param numero de argumentos
+ * @param array de argumentos
+ * @param Database onde sera adicionados as manpages
+ */
+void indexFiles(int argc, char** argv, Database& database) {
+	vector<string> words;
+	for (--argc; argc > 0; --argc) { //argv[0] é o nome do nosso comando
+		string filename = argv[argc];
+		string concatenated(""), actual;
+		ifstream file(filename.c_str());
 
+		while (getline(file, actual)) {
+			concatenated += actual + "\n";
+			stringstream line(actual);
+
+			while (line >> actual) {
+				words.push_back(actual);
+			}
+		}
+		filename = removeExtension(filename);
+		database.insert(Manpage(filename, words),diskManpage(filename.c_str(),concatenated.c_str()));
+	}
+}
+
+/**
+ * Mostra as opcoes ao usuario
+ * @param database que sera usada
+ */
+void console(int argc, char** argv, Database& database) {
 	string input;
 
-	char deletar = 'k';
+	char deletar = 'n'; //trocar
 	while (deletar != 's' && deletar != 'n' && deletar != 'y') {
-		cout << "Deseja utilizar a indexação de manpages existente? Se nao, os arquivos anteriores serão deletados:"<< endl;
+		cout << "Deseja utilizar a indexação de manpages existente? Se nao, os arquivos anteriores serao deletados:" << endl;
 		getline(cin, input);
 		deletar = tolower(input.at(0));
 	}
@@ -162,32 +166,43 @@ void console() {
 		database.clear();
 	}
 
-	int opcao;
-	while (true) {
-		cout << "Opcoes:" << endl;
-		cout << "1) Fazer uma pesquisa por nome da manpage." << endl;
-		cout
-		<< "2) Fazer uma pesquisa por manpage contendo uma palavra expecifica"
-		<< endl;
-		cout << "3) Fazer uma pesquisa por manpage contendo diversas palavras"
-				<< endl;
-		getline(cin, input);
-		stringstream nro(input);
-		nro >> opcao;
-		if (opcao > 0 && opcao < 4)
-			break;
-		cout << "Opcao invalida. Digite um numero entre 1 e 3" << endl;
-	}
-	switch (opcao) {
-	case 1:
-		pesquisaNome(database);
-		break;
-	case 2:
-		pesquisaConteudo(database);
-		break;
-	case 3:
-		pesquisaMultiplosConteudos(database);
-		break;
-	}
+	indexFiles(argc, argv, database);
 
+	bool state = true;
+	while (state) {
+		int opcao;
+		while (true) {
+			cout << "Opcoes:" << endl;
+			cout << "1) Fazer uma pesquisa por nome da manpage." << endl;
+			cout << "2) Fazer uma pesquisa por manpage contendo uma palavra expecifica" << endl;
+			cout << "3) Fazer uma pesquisa por manpage contendo diversas palavras" << endl;
+			cout << "4) Sair do programa" << endl;
+			getline(cin, input);
+			stringstream nro(input);
+			nro >> opcao;
+			if (opcao > 0 && opcao < 5)
+				break;
+			cout << "Opcao invalida. Digite um numero entre 1 e 4" << endl;
+		}
+		switch (opcao) {
+		case 1:
+			pesquisaNome(database);
+			break;
+		case 2:
+			pesquisaConteudo(database);
+			break;
+		case 3:
+			pesquisaMultiplosConteudos(database);
+			break;
+		case 4:
+			state = false;
+			break;
+		}
+	}
+}
+
+int main(int argc, char** argv) {
+	Database database("manpages.dat", "invertedLists.dat");
+
+	console(argc, argv, database);
 }
