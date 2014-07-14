@@ -11,6 +11,7 @@
 #include <deque>
 
 #include "Database.h"
+#include "AvlTree.h"
 
 using namespace std;
 
@@ -61,10 +62,10 @@ diskManpage Database::nameQuery(string name) {
  * @return lista dos nomes das manpages que contem esta palavra
  */
 vector<string> Database::contentQuery(string word) {
-	deque<int> invertedList = secondaryIndex.search(word);
+	AvlTree tree = secondaryIndex.search(word);
 	vector<string> ret;
-	for (size_t i = 0; i < invertedList.size(); ++i) {
-		ret.push_back(readName(manpageRecordFileName_, invertedList[i]));
+	for (AvlTree::iterator it = tree.begin(); it != tree.end(); ++it) {
+		ret.push_back(readName(manpageRecordFileName_, *it));
 	}
 	return ret;
 }
@@ -77,17 +78,17 @@ vector<string> Database::contentQuery(string word) {
  */
 vector<string> Database::multipleContentQuery(string word1, string word2) {
 	vector<string> ret;
-	deque<int> lesser = secondaryIndex.search(word1);
-	deque<int> greater = secondaryIndex.search(word2);
+	AvlTree lesser = secondaryIndex.search(word1);
+	AvlTree greater = secondaryIndex.search(word2);
 
 	if (greater.size() < lesser.size()) {
 		swap(greater, lesser);
 	}
 
-	for (size_t i = 0; i < lesser.size(); ++i) {
-		for (size_t j = 0; j < greater.size(); ++j)
-			if (lesser[i] == greater[j]) {
-				string toAdd = readName(manpageRecordFileName_, lesser[i]);
+	for (AvlTree::iterator it = lesser.begin(); it != lesser.end(); ++it) {
+		for (AvlTree::iterator that = greater.begin(); that != greater.end(); ++that)
+			if (*it == *that) {
+				string toAdd = readName(manpageRecordFileName_, *it);
 				ret.push_back(toAdd);
 			}
 	}
