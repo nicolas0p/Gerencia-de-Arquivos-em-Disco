@@ -37,7 +37,7 @@ public:
 	Database(std::string manpageRecordFileName, std::string invertedListRecordFileName);
 	~Database();
 
-	void insert(string filename);
+	void insert(string& filename);
 	diskManpage nameQuery(const string& name) const;
 	deque<string> contentQuery(const string& word) const;
 	deque<string> multipleContentQuery(const string& word1, const string& word2) const;
@@ -55,9 +55,7 @@ private:
 	void writeRecord(diskManpage manpage, string fileName, int index);
 	diskManpage readRecord(string fileName,int recordIndex) const;
 	string readName(string fileName,int recordIndex) const;
-	string removeExtension(string name);
+	string removeExtension(string& name) const;
 };
-
-
 
 #endif /* DATABASE_H_ */

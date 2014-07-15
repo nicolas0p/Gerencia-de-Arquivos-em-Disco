@@ -36,7 +36,7 @@ Database::~Database() {
  * Isso inclui sua indexacao primaria(pelo seu nome) e secundaria(por todas as palavras que ela contem)
  * @param Nome do arquivo da manpage a ser adicionada no banco de dados
  */
-void Database::insert(string filename) {
+void Database::insert(string& filename) {
 	deque<string> words;
 	string concatenated(""), actual;
 	ifstream file(filename.c_str());
@@ -188,7 +188,7 @@ string Database::readName(string fileName, int recordIndex) const {
  * @param Palavra que se quer tirar a extensao
  * @return A palavra sem extensao
  */
-string Database::removeExtension(string name) {
+string Database::removeExtension(string& name) const {
 	int i = name.length() - 1;
 	for (; i >= 0; --i) {
 		if (name[i] == '.') {

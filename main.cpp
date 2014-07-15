@@ -15,6 +15,7 @@
 #include "Database.h"
 #include "QueryException.h"
 #include "SecundaryTree.h"
+#include "WriteTreeToDisk.h"
 
 using namespace std;
 
@@ -105,22 +106,6 @@ void pesquisaMultiplosConteudos(const Database& database) {
 }
 
 /**
- * retorna a posicao do elemento searched no array por busca binaria
- */
-int search(int* array, int searched, int left, int right) {
-	int middle = (right + left) / 2;
-	if (searched == array[middle])
-		return middle;
-	if (searched > array[middle]) {
-		return search(array, searched, middle, right);
-	} else {
-		return search(array, searched, left, middle);
-	}
-	if (left == right)
-		return -1;
-}
-
-/**
  * Escreve os arquivos recebidos de parametro na execucao do programa
  * @param numero de argumentos
  * @param array de argumentos
@@ -187,9 +172,28 @@ void console(int argc, char** argv, Database& database) {
 		}
 	}
 }
-
+/*
 int main(int argc, char** argv) {
 	Database database("manpages.dat", "invertedLists.dat");
 
 	console(argc, argv, database);
 }
+*/
+ int main() {
+	 SecundaryTree tree;
+	 tree.insert("one", 1); tree.insert("one", 2);
+	 tree.insert("one", 3); tree.insert("one", 4);
+	 tree.insert("another", 5); tree.insert("another", 6);
+	 tree.insert("another", 7); tree.insert("another", 8);
+
+	 string treeFileName("secondaryTree.dat"), invertedListFileName("invertedList.dat");
+	 writeSecondaryTreeToDisk(treeFileName, invertedListFileName, tree);
+
+	 //int listPosition = searchTreeOnDisk(treeFileName, "one");
+
+//	 deque<int> numbers = readInvertedList(invertedListFileName, listPosition);
+//	 cout << "Lista lida da memoria:" << endl;
+//	 for(size_t i = 0; i < numbers.size(); ++i) {
+//		 cout << numbers[i] << endl;
+//	 }
+ }
