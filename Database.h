@@ -34,26 +34,28 @@ struct diskManpage {
 
 class Database {
 public:
-	Database(std::string manpageRecordFileName, std::string invertedListRecordFileName);
+	Database(std::string manpageFileName, std::string primaryIndexFileName, std::string secondaryIndexFileName, std::string invertedListFileName);
 	~Database();
 
-	void insert(string& filename);
-	diskManpage nameQuery(const string& name) const;
-	deque<string> contentQuery(const string& word) const;
-	deque<string> multipleContentQuery(const string& word1, const string& word2) const;
+	void insert(string filename);
+	diskManpage nameQuery(string name) const;
+	deque<string> contentQuery(string word) const;
+	deque<string> multipleContentQuery(string word1, string word2) const;
 	void clear();
 
 private:
 	//variaveis
-	PrimaryTree primaryIndex;
-	SecundaryTree secondaryIndex;
-	std::string manpageRecordFileName_;
-	std::string invertedListRecordFileName_;
+	PrimaryTree primaryIndexTree;
+	SecundaryTree secondaryIndexTree;
+	std::string manpageFileName_;
+	std::string primaryIndexFileName_;
+	std::string secondaryIndexFileName_;
+	std::string invertedListFileName_;
 	int manpageIndex_;
 
 	//metodos
-	void writeRecord(diskManpage manpage, string fileName, int index);
-	diskManpage readRecord(string fileName,int recordIndex) const;
+	void writeManPage(diskManpage& manpage, string fileName, int index);
+	diskManpage readManPage(string fileName,int recordIndex) const;
 	string readName(string fileName,int recordIndex) const;
 	string removeExtension(string& name) const;
 };

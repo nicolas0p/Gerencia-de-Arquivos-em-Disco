@@ -128,13 +128,13 @@ void indexFiles(int argc, char** argv, Database& database) {
 void console(int argc, char** argv, Database& database) {
 	string input;
 
-	char deletar = 'n'; //trocar
-	while (deletar != 's' && deletar != 'n' && deletar != 'y') {
+	char manter = 'n'; //trocar
+	while (manter != 's' && manter != 'n' && manter != 'y') {
 		cout << "Deseja utilizar a indexação de manpages existente? Se nao, os arquivos anteriores serao deletados:" << endl;
 		getline(cin, input);
-		deletar = tolower(input.at(0));
+		manter = tolower(input.at(0));
 	}
-	if (deletar == 'n') {
+	if (manter == 'n') {
 		database.clear();
 	}
 
@@ -172,30 +172,9 @@ void console(int argc, char** argv, Database& database) {
 		}
 	}
 }
-/*
+
 int main(int argc, char** argv) {
-	Database database("manpages.dat", "invertedLists.dat");
+	Database database("manpa.dat", "primaryIndex.dat", "secondaryIndex.dat","invertedLists.dat");
 
 	console(argc, argv, database);
 }
-*/
- int main() {
-	 SecundaryTree tree;
-	 tree.insert("one", 1); tree.insert("one", 2);
-	 tree.insert("one", 3); tree.insert("one", 4);
-	 tree.insert("another", 5); tree.insert("another", 6);
-	 tree.insert("another", 7); tree.insert("another", 8);
-	 tree.insert("another", 51);tree.insert("another", 23);
-
-	 string treeFileName("secondaryTree.dat"), invertedListFileName("invertedList.dat");
-	 writeSecondaryTreeToDisk(treeFileName, invertedListFileName, tree);
-
-	 int listPosition = searchTreeOnDisk(treeFileName, "another");
-
-
-	 deque<int> numbers = readInvertedList(invertedListFileName, listPosition);
-	 cout << "Lista lida da memoria:" << endl;
-	 for(size_t i = 0; i < numbers.size(); ++i) {
-		 cout << numbers[i] << endl;
-	 }
- }
