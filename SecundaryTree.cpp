@@ -84,7 +84,8 @@ SecundaryTree::Node* SecundaryTree::erase(Node* node, const std::string &string)
 		}
 		node->key = min->key;
 		delete node->manpage_indexes;
-		node->manpage_indexes = new AvlTree(*(min->manpage_indexes)); //faz copia da lista, pois a lista sera deletada
+		node->manpage_indexes = min->manpage_indexes; //faz copia da lista, pois a lista sera deletada
+		min->manpage_indexes = 0;
 		node->right = erase(node->right, min->key);
 		if (height(node->left) - height(node->right) == 2) {
 			if (height(node->right->left) - height (node->right->right) >= 0) {
