@@ -53,6 +53,7 @@ void Database::insert(string filename) {
 		while (line >> actual) {
 			words.push_back(actual);
 		}
+
 	}
 	filename = removeExtension(filename);
 	Manpage manpage(filename, words);
@@ -110,12 +111,23 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 		swap(lesser, greater);
 	}
 	deque<int> both;
-	for (size_t i = 0; i < lesser.size(); ++i) {
-		//TODO
+	while(!lesser.empty()) {
+		int actual = lesser.front();
+		lesser.pop_front();
+		int result = binarySearch(greater, 0, greater.size()-1, actual);
+		if(result != -1) {
+			both.push_back(actual);
+		}
 	}
 
+	deque<string> ret;
+	while (!both.empty()) {
+		int actual = lesser.front();
+		lesser.pop_front();
+		ret.push_back(readName(manpageFileName_, actual));
+	}
 
-	return deque<string>();
+	return ret;
 }
 /**
  * Deleta os arquivos de indice primário, secundário, lista invertida e manpages do disco

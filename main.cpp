@@ -139,7 +139,7 @@ void console(int argc, char** argv, Database& database) {
 		indexFiles(argc, argv, database);
 	}
 
-	database.removeConnectives(); //Não funcionando, segfault na arvore
+	//database.removeConnectives(); //Não funcionando, segfault na arvore
 	cout << "Escrevendo arquivos em disco" <<endl;
 	database.writeIndexToDisk();
 

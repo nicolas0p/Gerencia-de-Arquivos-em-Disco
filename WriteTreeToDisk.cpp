@@ -7,7 +7,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <deque>
 
 #include "QueryException.h"
 #include "WriteTreeToDisk.h"
@@ -22,10 +21,11 @@ using namespace std;
  * @param Nome do arquivo onde as listas invertidas serao gravadas
  * @param Arvore que sera gravada no arquivo
  */
-void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedListFilename, SecundaryTree& tree) {
+void writeSecondaryTreeToDisk(std::string treeFilename,
+		std::string invertedListFilename, SecundaryTree& tree) {
 	std::ofstream treeFile(treeFilename.c_str(), std::ios::binary);
 
-	if(!treeFile) {
+	if (!treeFile) {
 		std::cout << "Erro ao abrir o arquivo " << treeFilename << std::endl;
 	}
 
@@ -33,9 +33,11 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 	treeFile.write((char *) &treeSize, sizeof(int)); //grava o tamanho da lista
 	int greatestListSize = tree.greatestListSize() + 1; //+1 espaço para o -1 no fim
 	//escreve o tamanho da maior lista
-	std::ofstream invertedListFile(invertedListFilename.c_str(), std::ios::binary);
-	if(!invertedListFile) {
-		std::cout << "Erro ao abrir o arquivo " << invertedListFilename << std::endl;
+	std::ofstream invertedListFile(invertedListFilename.c_str(),
+			std::ios::binary);
+	if (!invertedListFile) {
+		std::cout << "Erro ao abrir o arquivo " << invertedListFilename
+				<< std::endl;
 	}
 
 	invertedListFile.write((char *) &greatestListSize, sizeof(int));
@@ -50,22 +52,22 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 		while (indexes.size() > 0) {
 			int toWrite = indexes.front();
 			indexes.pop_front();
-			invertedListFile.seekp(count * greatestListSize * sizeof(int) + i * sizeof(int) + sizeof(int));
+			invertedListFile.seekp(
+					count * greatestListSize * sizeof(int) + i * sizeof(int)
+							+ sizeof(int));
 			invertedListFile.write((char *) &toWrite, sizeof(int));
 			++i;
 		}
 		int endOfList = -1;
-		invertedListFile.seekp(count * greatestListSize * sizeof(int) + i * sizeof(int) + sizeof(int));
+		invertedListFile.seekp(
+				count * greatestListSize * sizeof(int) + i * sizeof(int)
+						+ sizeof(int));
 		invertedListFile.write((char *) &endOfList, sizeof(int)); //escreve -1 depois do ultimo elemento para marcar o fim da lista
 		diskNode add(actual.string.c_str(), count); //nodo contendo a palavra e a localizacao de sua lista no arquivo
 		treeFile.seekp(count * sizeof(diskNode) + sizeof(int));
 		treeFile.write((char *) &add, sizeof(diskNode));
 		++count; //atualizar posicao onde a proxima lista vai ser gravada no arquivo
 	}
-
-
-
-
 
 	//
 	//	for (SecundaryTree::iterator it = tree.begin(); it != tree.end(); ++it) {
@@ -89,7 +91,7 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree) {
 	std::ofstream treeFile(treeFilename.c_str(), std::ios::binary);
 
-	if(!treeFile) {
+	if (!treeFile) {
 		std::cout << "Erro ao abrir o arquivo " << treeFilename << std::endl;
 	}
 	int treeSize = tree.size();
@@ -113,11 +115,13 @@ void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree) {
  * @param posicao da lista que se deseja ler no arquivo de listas
  * @return lista de posicoes das manpages que esta lista contem
  */
-std::deque<int> readInvertedList(std::string invertedListFileName, int indexOfList) {
+std::deque<int> readInvertedList(std::string invertedListFileName,
+		int indexOfList) {
 	std::ifstream file(invertedListFileName.c_str(), std::ios::binary);
 
-	if(!file) {
-		std::cout << "Erro ao abrir o arquivo " << invertedListFileName << std::endl;
+	if (!file) {
+		std::cout << "Erro ao abrir o arquivo " << invertedListFileName
+				<< std::endl;
 	}
 
 	std::deque<int> numbers;
@@ -129,7 +133,7 @@ std::deque<int> readInvertedList(std::string invertedListFileName, int indexOfLi
 	for (int i = 0; i < size; ++i) {
 		file.seekg(listPosition * sizeof(int) + i * sizeof(int) + sizeof(int)); //posicao lista + posicao elemento + int (tamanho no inicio)
 		file.read((char *) &read, sizeof(int));
-		if(read == -1) //fim da lista
+		if (read == -1) //fim da lista
 			break;
 		numbers.push_back(read);
 	}
@@ -146,7 +150,7 @@ std::deque<int> readInvertedList(std::string invertedListFileName, int indexOfLi
 int searchTreeOnDisk(std::string filename, std::string toSearch) {
 	std::ifstream list(filename.c_str(), std::ios::binary);
 
-	if(!list) {
+	if (!list) {
 		std::cout << "Erro ao abrir o arquivo " << filename << std::endl;
 	}
 
@@ -169,4 +173,23 @@ int searchTreeOnDisk(std::string filename, std::string toSearch) {
 		}
 	}
 	throw QueryException();
+}
+
+int binarySearch(std::deque<int> array, int first, int last, int search_key) {
+	int index;
+
+	if (first > last)
+		index = -1;
+	else {
+		int middle = (first + last) / 2;
+
+		if (search_key == array[middle])
+			index = middle;
+		else if (search_key < array[middle])
+			index = binarySearch(array, first, middle - 1, search_key);
+		else
+			index = binarySearch(array, middle + 1, last, search_key);
+
+	}
+	return index;
 }
