@@ -35,18 +35,16 @@ void writeInvertedListToDisk(std::string filename, int listRegisterSize,
  * @param Arvore que sera gravada no arquivo
  */
 void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedListFilename, SecundaryTree& tree) {
-	std::ofstream treeFile(treeFilename.c_str(), std::ios::in | std::ios::binary);
+	std::ofstream treeFile(treeFilename.c_str(), std::ios::binary);
 
 	int treeSize = tree.size();
 	treeFile.write((char *) &treeSize, sizeof(int)); //grava o tamanho da lista
-	treeFile.seekp(sizeof(int));
 
 	int greatestListSize = tree.greatestListSize() + 1; //+1 espaço para o -1 no fim
 
 	//escreve o tamanho da maior lista
-	std::ofstream invertedListFile(invertedListFilename.c_str(), std::ios::in | std::ios::binary);
+	std::ofstream invertedListFile(invertedListFilename.c_str(), std::ios::binary);
 	invertedListFile.write((char *) &greatestListSize, sizeof(int));
-	invertedListFile.close();
 
 	int invertedListPosition = 0;
 	int treeNodeIndex = 0;
@@ -54,9 +52,11 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 		StringTreeUnion actual = *it;
 		diskNode add(actual.string.c_str(), invertedListPosition); //nodo contendo a palavra e a localizacao de sua lista no arquivo
 		writeInvertedListToDisk(invertedListFilename, greatestListSize,	actual.tree, invertedListPosition);
+
 		treeFile.seekp(treeNodeIndex * sizeof(diskNode) + sizeof(int));
 		treeFile.write((char *) &add, sizeof(diskNode));
 
+		++treeNodeIndex;
 		++invertedListPosition; //atualizar posicao onde a proxima lista vai ser gravada no arquivo
 	}
 }
@@ -71,18 +71,18 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 void writeInvertedListToDisk(std::string filename, int greaterListSize, AvlTree* tree, int index) {
 	std::ofstream file(filename.c_str(), std::ios::binary);
 	int listPosition = index * greaterListSize; //posicao dessa lista no arquivo = i * tamanho padrao lista
-	file.seekp(listPosition);
 
 	int i = 0;
 	for (AvlTree::iterator it = tree->begin(); it != tree->end(); ++it) { //itera sobre a arvore
 		int toWrite = *it;
-		file.write((char *) &toWrite, sizeof(int));
+		int elementPosition = i * sizeof(int); //posicao do elemento na lista
 
+		file.seekp(listPosition + elementPosition + sizeof(int));
+		file.write((char *) &toWrite, sizeof(int));
 		++i;
-		int elementPosition = i * sizeof(int); //posicao do prox elemento na lista
-		file.seekp(listPosition + elementPosition);
 	}
 	int endOfList = -1;
+	file.seekp(listPosition + (i+1) * sizeof(int));
 	file.write((char *) &endOfList, sizeof(int)); //escreve -1 depois do ultimo elemento para marcar o fim da lista
 }
 
@@ -92,19 +92,21 @@ void writeInvertedListToDisk(std::string filename, int greaterListSize, AvlTree*
  * @param posicao da lista que se deseja ler no arquivo de listas
  */
 std::deque<int> readInvertedList(std::string invertedListFileName, int indexOfList) {
-	std::ifstream file(invertedListFileName.c_str());
+	std::ifstream file(invertedListFileName.c_str(), std::ios::binary);
 	std::deque<int> numbers;
 	int size;
 	file.read((char *) &size, sizeof(int)); //lê o tamanho padrao das listas
-
 	int listPosition = indexOfList * size; //posicao da lista no arquivo
 
 	int read;
-	for (int i = 0; read != -1 && i < size; ++i) {
+	for (int i = 0; i < size; ++i) {
 		int elementPosition = i * sizeof(int); //posicao desse elemento na lista
 
 		file.seekg(listPosition + elementPosition + sizeof(int)); //posicao lista + posicao elemento + int (tamanho no inicio)
 		file.read((char *) &read, sizeof(int));
+		if(read == -1) //fim da lista
+			break;
+		numbers.push_back(read);
 	}
 	return numbers;
 }
@@ -117,25 +119,26 @@ std::deque<int> readInvertedList(std::string invertedListFileName, int indexOfLi
  * A arvore e gravada no disco como uma lista ordenada, tendo seu tamanho no inicio
  */
 int searchTreeOnDisk(std::string& filename, std::string toSearch) {
-	std::ifstream list(filename.c_str(), std::ios::binary);
-	int size = 0;
-	list.read((char *) &size, sizeof(int));
-	list.seekg(sizeof(int));
+        std::ifstream list(filename.c_str(), std::ios::binary);
+        int size = 0;
+        list.read((char *) &size, sizeof(int));
+        list.seekg(sizeof(int));
 
-	int left = 0, right = size - 1;
-	diskNode found("", 0);
-	while (found.word != toSearch && left < right) {
-		int middle = (right + left) / 2;
-		list.seekg(middle * sizeof(diskNode) + sizeof(int));
-		list.read((char *) &found, sizeof(diskNode));
+        int left = 0, right = size - 1;
+        diskNode found("", 0);
+        while (left <= right) {
+                int middle = (right + left) / 2;
+                list.seekg(middle * sizeof(diskNode) + sizeof(int));
+                list.read((char *) &found, sizeof(diskNode));
 
-		if (toSearch > found.word) {
-			left = middle;
-		} else {
-			right = middle;
-		}
-	}
-	if (found.word != toSearch)
-		throw QueryException();
-	return found.listPosition;
+
+                if (toSearch == found.word) {
+                        return found.listPosition;
+                } else if (toSearch > found.word) {
+                        left = middle + 1;
+                } else {
+                        right = middle - 1;
+                }
+        }
+        throw QueryException();
 }
