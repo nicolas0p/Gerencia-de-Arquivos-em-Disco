@@ -185,15 +185,15 @@ int main(int argc, char** argv) {
 	 tree.insert("one", 3); tree.insert("one", 4);
 	 tree.insert("another", 5); tree.insert("another", 6);
 	 tree.insert("another", 7); tree.insert("another", 8);
+	 tree.insert("another", 51);tree.insert("another", 23);
 
 	 string treeFileName("secondaryTree.dat"), invertedListFileName("invertedList.dat");
 	 writeSecondaryTreeToDisk(treeFileName, invertedListFileName, tree);
 
-	 /*int listPosition = searchTreeOnDisk(treeFileName, "one");
-	 cout << listPosition << endl;
-	*/
+	 int listPosition = searchTreeOnDisk(treeFileName, "another");
 
-	 deque<int> numbers = readInvertedList(invertedListFileName, 0);
+
+	 deque<int> numbers = readInvertedList(invertedListFileName, listPosition);
 	 cout << "Lista lida da memoria:" << endl;
 	 for(size_t i = 0; i < numbers.size(); ++i) {
 		 cout << numbers[i] << endl;
