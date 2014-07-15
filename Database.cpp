@@ -104,17 +104,21 @@ deque<string> Database::contentQuery(string word) const {
 deque<string> Database::multipleContentQuery(string first, string second) const {
 	int firstPosition = searchTreeOnDisk(secondaryIndexFileName_, first);
 	int secondPosition = searchTreeOnDisk(secondaryIndexFileName_, second);
-	deque<int> greater = readInvertedList(invertedListFileName_, firstPosition);
-	deque<int> lesser = readInvertedList(invertedListFileName_, secondPosition);
+	deque<int> one = readInvertedList(invertedListFileName_, firstPosition);
+	deque<int> another = readInvertedList(invertedListFileName_, secondPosition);
 
-	if(lesser.size() > greater.size()) {
+
+	deque<int> *greater = &one;
+	deque<int> *lesser = &another;
+
+	if(lesser->size() > greater->size()) {
 		swap(lesser, greater);
 	}
 	deque<int> both;
-	while(!lesser.empty()) {
-		int actual = lesser.front();
-		lesser.pop_front();
-		int result = binarySearch(greater, 0, greater.size()-1, actual);
+	while(!lesser->empty()) {
+		int actual = lesser->front();
+		lesser->pop_front();
+		int result = binarySearch(*greater, 0, greater->size()-1, actual);
 		if(result != -1) {
 			both.push_back(actual);
 		}
@@ -122,8 +126,8 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 
 	deque<string> ret;
 	while (!both.empty()) {
-		int actual = lesser.front();
-		lesser.pop_front();
+		int actual = lesser->front();
+		lesser->pop_front();
 		ret.push_back(readName(manpageFileName_, actual));
 	}
 
