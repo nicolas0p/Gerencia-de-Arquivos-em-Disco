@@ -60,10 +60,10 @@ void Database::insert(string filename) {
 
 	writeManPage(disk, manpageFileName_, manpageIndex_);
 	primaryIndexTree.insert(manpage.name(), manpageIndex_);
-
 	for (size_t i = 0; i < words.size(); ++i) { //adicionar todas as palavras do conteudo na indexacao secundaria
 		secondaryIndexTree.insert(words[i], manpageIndex_);
 	}
+
 	++manpageIndex_; //atualizar index
 }
 
@@ -143,9 +143,7 @@ void Database::writeManPage(diskManpage& manpage, string fileName, int index) {
 		output.seekp(index * sizeof(diskManpage));
 	}
 
-	diskManpage disk(manpage.name, manpage.content);
-
-	output.write((char *) &disk, sizeof(diskManpage));
+	output.write((char *) &manpage, sizeof(diskManpage));
 }
 
 /**

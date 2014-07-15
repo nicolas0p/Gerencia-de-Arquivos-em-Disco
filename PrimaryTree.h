@@ -37,77 +37,6 @@ class PrimaryTree {
 		int manpage_index;
 	};
 
-	class iterator_base {
-
-	public:
-
-		iterator_base(Node *root_) {
-			while (root_ != 0) {
-				node_stack.push(root_);
-				root_ = root_->left;
-			}
-			if (node_stack.empty()) {
-				current = 0;
-			} else {
-				current = node_stack.top();
-				node_stack.pop();
-			}
-		}
-
-		StringIntUnion operator*() {
-			return StringIntUnion(current->key, current->manpage_index);
-		}
-
-		iterator_base& operator++() {
-			if (current->right) {
-				node_stack.push(current->right);
-				Node *min = current->right->left;
-				while (min) {
-					node_stack.push(current->right->left);
-					min = min->left;
-				}
-			}
-			if (node_stack.size() == 0) {
-				current = 0;
-				return *this;
-			}
-			current = node_stack.top();
-			node_stack.pop();
-			return *this;
-		}
-
-		iterator_base operator++(int) {
-			iterator_base copy = *this;
-			if (current->right) {
-				node_stack.push(current->right);
-				Node *min = current->right->left;
-				while (min) {
-					node_stack.push(current->right->left);
-					min = min->left;
-				}
-			}
-			if (node_stack.size() == 0) {
-				current = 0;
-				return copy;
-			}
-			current = node_stack.top();
-			node_stack.pop();
-			return copy;
-		}
-
-		bool operator==(const iterator_base& other) const {
-			return current == other.current;
-		}
-
-		bool operator!=(const iterator_base& other) const {
-			return !(current == other.current);
-		}
-
-	private:
-		std::stack<Node *> node_stack;
-		Node *current;
-	};
-
 public:
 	PrimaryTree();
 	virtual ~PrimaryTree();
@@ -115,16 +44,7 @@ public:
 	void erase(std::string);
 	size_t size() const;
 	int search(std::string) const;
-
-	typedef iterator_base iterator;
-
-	iterator begin() {
-		return iterator(root_);
-	}
-
-	iterator end() {
-		return iterator(0);
-	}
+	std::deque<StringIntUnion> toDeque();
 
 private:
 	Node *root_;
@@ -133,6 +53,7 @@ private:
 	Node* insert(Node*, std::string, int);
 	Node* erase(Node*, std::string);
 	int search(Node*, std::string) const;
+	void toDeque(Node *node, std::deque<StringIntUnion> &deque);
 
 	Node* simpleRight(Node*);
 	Node* simpleLeft(Node*);

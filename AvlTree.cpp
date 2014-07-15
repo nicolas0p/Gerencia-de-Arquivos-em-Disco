@@ -168,4 +168,19 @@ int AvlTree::height(Node *node) const {
 	return node->_height;
 }
 
+std::deque<int> AvlTree::toDeque() {
+	std::deque<int> deque;
+	toDeque(root, deque);
+	return deque;
+}
+
+void AvlTree::toDeque(Node *node, std::deque<int> &deque) {
+	if (node == 0) {
+		return;
+	}
+	toDeque(node->_left, deque);
+	deque.push_back(node->_data);
+	toDeque(node->_right, deque);
+}
+
 

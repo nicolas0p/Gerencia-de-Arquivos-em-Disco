@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <deque>
 
 #include "QueryException.h"
 #include "WriteTreeToDisk.h"
@@ -25,8 +26,8 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 	std::ofstream treeFile(treeFilename.c_str(), std::ios::binary);
 
 	if(!treeFile) {
-			std::cout << "Erro ao abrir o arquivo " << treeFilename << std::endl;
-		}
+		std::cout << "Erro ao abrir o arquivo " << treeFilename << std::endl;
+	}
 
 	int treeSize = tree.size();
 	treeFile.write((char *) &treeSize, sizeof(int)); //grava o tamanho da lista
@@ -34,17 +35,21 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 	//escreve o tamanho da maior lista
 	std::ofstream invertedListFile(invertedListFilename.c_str(), std::ios::binary);
 	if(!invertedListFile) {
-			std::cout << "Erro ao abrir o arquivo " << invertedListFilename << std::endl;
-		}
+		std::cout << "Erro ao abrir o arquivo " << invertedListFilename << std::endl;
+	}
 
 	invertedListFile.write((char *) &greatestListSize, sizeof(int));
 
 	int count = 0;
-	for (SecundaryTree::iterator it = tree.begin(); it != tree.end(); ++it) {
-		StringTreeUnion actual = *it;
+	std::deque<StringTreeUnion> deque = tree.toDeque();
+	while (deque.size() > 0) {
+		StringTreeUnion actual = deque.front();
+		deque.pop_front();
 		int i = 0;
-		for (AvlTree::iterator ite = actual.tree->begin(); ite != actual.tree->end(); ++ite) { //itera sobre a arvore
-			int toWrite = *ite;
+		std::deque<int> indexes = actual.tree->toDeque();
+		while (indexes.size() > 0) {
+			int toWrite = indexes.front();
+			indexes.pop_front();
 			invertedListFile.seekp(count * greatestListSize * sizeof(int) + i * sizeof(int) + sizeof(int));
 			invertedListFile.write((char *) &toWrite, sizeof(int));
 			++i;
@@ -52,12 +57,28 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 		int endOfList = -1;
 		invertedListFile.seekp(count * greatestListSize * sizeof(int) + i * sizeof(int) + sizeof(int));
 		invertedListFile.write((char *) &endOfList, sizeof(int)); //escreve -1 depois do ultimo elemento para marcar o fim da lista
-
 		diskNode add(actual.string.c_str(), count); //nodo contendo a palavra e a localizacao de sua lista no arquivo
 		treeFile.seekp(count * sizeof(diskNode) + sizeof(int));
 		treeFile.write((char *) &add, sizeof(diskNode));
 		++count; //atualizar posicao onde a proxima lista vai ser gravada no arquivo
 	}
+
+
+
+
+
+	//
+	//	for (SecundaryTree::iterator it = tree.begin(); it != tree.end(); ++it) {
+	//		StringTreeUnion actual = *it;
+	//		int i = 0;
+	//		for (AvlTree::iterator ite = actual.tree->begin(); ite != actual.tree->end(); ++ite) { //itera sobre a arvore
+	//			int toWrite = *ite;
+	//			invertedListFile.seekp(count * greatestListSize * sizeof(int) + i * sizeof(int) + sizeof(int));
+	//			invertedListFile.write((char *) &toWrite, sizeof(int));
+	//			++i;
+	//		}
+	//
+	//	}
 }
 
 /**
@@ -69,21 +90,20 @@ void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree) {
 	std::ofstream treeFile(treeFilename.c_str(), std::ios::binary);
 
 	if(!treeFile) {
-			std::cout << "Erro ao abrir o arquivo " << treeFilename << std::endl;
-		}
+		std::cout << "Erro ao abrir o arquivo " << treeFilename << std::endl;
+	}
 	int treeSize = tree.size();
 	treeFile.write((char *) &treeSize, sizeof(int)); //grava o tamanho da lista
-
 	int count = 0;
-	for (PrimaryTree::iterator it = tree.begin(); it != tree.end(); ++it) {
-		StringIntUnion actual = *it;
-
+	std::deque<StringIntUnion> nodes = tree.toDeque();
+	while (nodes.size() > 0) {
+		StringIntUnion actual = nodes.front();
+		nodes.pop_front();
+		cout << actual.string << " " << actual.integer << endl;
 		diskNode add(actual.string.c_str(), actual.integer); //nodo contendo a palavra e a localizacao da sua manpage no arquivo
 		treeFile.seekp(count * sizeof(diskNode) + sizeof(int));
 		treeFile.write((char *) &add, sizeof(diskNode));
 		++count; //atualizar posicao onde a proxima lista vai ser gravada no arquivo
-
-		std::cout << actual.string  << " escrito em disco-"<< count << std::endl;
 	}
 }
 
@@ -127,8 +147,8 @@ int searchTreeOnDisk(std::string filename, std::string toSearch) {
 	std::ifstream list(filename.c_str(), std::ios::binary);
 
 	if(!list) {
-			std::cout << "Erro ao abrir o arquivo " << filename << std::endl;
-		}
+		std::cout << "Erro ao abrir o arquivo " << filename << std::endl;
+	}
 
 	int size;
 	list.read((char *) &size, sizeof(int));

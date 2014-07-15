@@ -41,77 +41,6 @@ class SecundaryTree {
 		AvlTree *manpage_indexes;
 	};
 
-	class iterator_base {
-
-	public:
-
-		iterator_base(Node *root) {
-			while (root != 0) {
-				node_stack.push(root);
-				root = root->left;
-			}
-			if (node_stack.empty()) {
-				current = 0;
-			} else {
-				current = node_stack.top();
-				node_stack.pop();
-			}
-		}
-
-		StringTreeUnion operator*() {
-			return StringTreeUnion(current->key, current->manpage_indexes);
-		}
-
-		iterator_base& operator++() {
-			if (current->right) {
-				node_stack.push(current->right);
-				Node *min = current->right->left;
-				while (min) {
-					node_stack.push(current->right->left);
-					min = min->left;
-				}
-			}
-			if (node_stack.size() == 0) {
-				current = 0;
-				return *this;
-			}
-			current = node_stack.top();
-			node_stack.pop();
-			return *this;
-		}
-
-		iterator_base operator++(int) {
-			iterator_base copy = *this;
-			if (current->right) {
-				node_stack.push(current->right);
-				Node *min = current->right->left;
-				while (min) {
-					node_stack.push(current->right->left);
-					min = min->left;
-				}
-			}
-			if (node_stack.size() == 0) {
-				current = 0;
-				return copy;
-			}
-			current = node_stack.top();
-			node_stack.pop();
-			return copy;
-		}
-
-		bool operator==(const iterator_base& other) const {
-			return current == other.current;
-		}
-
-		bool operator!=(const iterator_base& other) const {
-			return !(current == other.current);
-		}
-
-	private:
-		std::stack<Node *> node_stack;
-		Node *current;
-	};
-
 
 
 public:
@@ -122,16 +51,7 @@ public:
 	AvlTree* search(const std::string&) const;
 	size_t size() const;
 	size_t greatestListSize() const;
-
-	typedef iterator_base iterator;
-
-	iterator begin() {
-		return iterator(root_);
-	}
-
-	iterator end() {
-		return iterator(0);
-	}
+	std::deque<StringTreeUnion> toDeque();
 
 private:
 	Node *root_;
@@ -140,6 +60,7 @@ private:
 	Node* insert(Node*, const std::string&, int);
 	Node* erase(Node*, const std::string&);
 	AvlTree* search(Node*, const std::string&) const;
+	void toDeque(Node *node, std::deque<StringTreeUnion> &deque);
 
 	Node* simpleRight(Node*);
 	Node* simpleLeft(Node*);

@@ -184,3 +184,18 @@ size_t SecundaryTree::greatestListSize(Node *node) const {
 	}
 	return std::max(std::max(node->manpage_indexes->size(), greatestListSize(node->left)), greatestListSize(node->right));
 }
+
+std::deque<StringTreeUnion> SecundaryTree::toDeque() {
+	std::deque<StringTreeUnion> deque;
+	toDeque(root_, deque);
+	return deque;
+}
+
+void SecundaryTree::toDeque(Node *node, std::deque<StringTreeUnion> &deque) {
+	if (node == 0) {
+		return;
+	}
+	toDeque(node->left, deque);
+	deque.push_back(StringTreeUnion(node->key, node->manpage_indexes));
+	toDeque(node->right, deque);
+}

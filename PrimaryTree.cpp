@@ -171,3 +171,18 @@ int PrimaryTree::height(Node *node) const {
 	}
 	return node->height;
 }
+
+std::deque<StringIntUnion> PrimaryTree::toDeque() {
+	std::deque<StringIntUnion> deque;
+	toDeque(root_, deque);
+	return deque;
+}
+
+void PrimaryTree::toDeque(Node *node, std::deque<StringIntUnion> &deque) {
+	if (node == 0) {
+		return;
+	}
+	toDeque(node->left, deque);
+	deque.push_back(StringIntUnion(node->key, node->manpage_index));
+	toDeque(node->right, deque);
+}

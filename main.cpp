@@ -116,7 +116,6 @@ void indexFiles(int argc, char** argv, Database& database) {
 	for (--argc; argc > 0; --argc) { //argv[0] é o nome do nosso comando
 		string filename = argv[argc];
 		database.insert(filename);
-		cout << "Arquivo-" << i << " "<< filename << " lido" << endl;
 		++i;
 	}
 }
@@ -180,6 +179,30 @@ int main(int argc, char** argv) {
 	Database database("manpages.dat", "primaryIndex.dat", "secondaryIndex.dat","invertedLists.dat");
 	console(argc, argv, database);
 }
+
+
+//int main() {
+//	PrimaryTree t;
+//	t.insert("acctcms.1m", 1);
+//	t.insert("acctadm.1m", 2);
+//	t.insert("acct.h.3head", 3);
+//	t.insert("acct.2", 4);
+//	t.insert("acct.1m", 5);
+//	t.insert("access.2", 6);
+//	t.insert("accept.3xnet", 7);
+//	t.insert("accept.3socket", 8);
+//	t.insert("accept.1m", 9);
+//	t.insert("abs.3c", 10);
+//	t.insert("abort.3c", 11);
+//	t.insert("aac.7d", 12);
+//
+//	cout << t.size() << endl;
+//
+//	deque<StringIntUnion> d = t.toDeque();
+//	for (size_t i = 0; i < d.size(); i++) {
+//		cout << d[i].string << " " << d[i].integer << endl;
+//	}
+//}
 /*
 int main() {
 	PrimaryTree tree;
@@ -196,4 +219,5 @@ int main() {
 		cout << a[i] << endl;
 	}
 }*/
+
 
