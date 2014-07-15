@@ -42,6 +42,8 @@ public:
 	deque<string> contentQuery(string word) const;
 	deque<string> multipleContentQuery(string word1, string word2) const;
 	void clear();
+	void writeIndexToDisk();
+	void removeConnectives();
 
 private:
 	//variaveis

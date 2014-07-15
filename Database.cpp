@@ -108,7 +108,7 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 	if (greater->size() < lesser->size()) {
 		swap(greater, lesser);
 	}
-	//cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;cout << " hueeee" << endl;
+
 	for (AvlTree::iterator it = lesser->begin(); it != lesser->end(); ++it) {
 		if (greater->search(*it)) {
 			ret.push_back(readName(manpageFileName_, *it));
@@ -118,13 +118,13 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 	return ret;
 }
 /**
- * Deleta os arquivos de indice primário e secundário do disco
+ * Deleta os arquivos de indice primário, secundário, lista invertida e manpages do disco
  */
 void Database::clear() {
-	ofstream manpage(manpageFileName_.c_str(), ios::trunc);
-	ofstream primary(primaryIndexFileName_.c_str(), ios::trunc);
-	ofstream secondary(secondaryIndexFileName_.c_str(), ios::trunc);
-	ofstream inverted(invertedListFileName_.c_str(), ios::trunc);
+	remove(manpageFileName_.c_str());
+	remove(primaryIndexFileName_.c_str());
+	remove(secondaryIndexFileName_.c_str());
+	remove(invertedListFileName_.c_str());
 }
 
 /**
@@ -206,4 +206,35 @@ string Database::removeExtension(string& name) const {
 		}
 	}
 	return name.substr(0, i);
+}
+ /**
+  * Remove da indexacao secundaria os conectivos
+  * NÃO FUNCIONANDO SEGFAULT NA REMOCAO DA ARVORE
+  */
+void Database::removeConnectives() {
+	deque<string> toRemove;
+	toRemove.push_back("a"); toRemove.push_back("an"); toRemove.push_back("the"); toRemove.push_back("or");
+	toRemove.push_back("for"); toRemove.push_back("and"); toRemove.push_back("nor"); toRemove.push_back("but");
+	toRemove.push_back("or"); toRemove.push_back("yet"); toRemove.push_back("so"); toRemove.push_back("you");
+	toRemove.push_back("what"); toRemove.push_back("which"); toRemove.push_back("who"); toRemove.push_back("whom");
+	toRemove.push_back("whose"); toRemove.push_back("whichever");  toRemove.push_back("whoever"); toRemove.push_back("whomever");
+	toRemove.push_back("anybody"); toRemove.push_back("anyone"); toRemove.push_back("anything"); toRemove.push_back("each");
+	toRemove.push_back("either"); toRemove.push_back("everybody"); toRemove.push_back("everyone"); toRemove.push_back("everything");
+	toRemove.push_back("nothing"); toRemove.push_back("one"); toRemove.push_back("both"); toRemove.push_back("few");
+	toRemove.push_back("many"); toRemove.push_back("several"); toRemove.push_back("all"); toRemove.push_back("any");
+	toRemove.push_back("most"); toRemove.push_back("none"); toRemove.push_back("some");
+
+	while(!toRemove.empty()) {
+		string rem = toRemove.front();
+		toRemove.pop_front();
+		secondaryIndexTree.erase(rem); //segfault aqui!
+	}
+}
+
+/**
+ * Escreve as arvores de indexacao primaria e secundaria no disco em forma de lista ordenada
+ */
+void Database::writeIndexToDisk() {
+	writePrimaryTreeToDisk(primaryIndexFileName_, primaryIndexTree);
+	writeSecondaryTreeToDisk(secondaryIndexFileName_, invertedListFileName_, secondaryIndexTree);
 }

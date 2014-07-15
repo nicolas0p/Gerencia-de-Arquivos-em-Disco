@@ -1,5 +1,5 @@
 /*
- * PrimaryDiskTree.cpp
+ * WriteTreeToDisk.h
  *
  *  Created on: 13/07/2014
  *      Author: nicolas
@@ -12,9 +12,10 @@
 #include <deque>
 #include <string>
 
+#include "PrimaryTree.h"
 #include "SecundaryTree.h"
 
-const int greatestWordSize = 84;
+const int greatestWordSize = 84; //numero pesquisado nas manpages
 
 struct diskNode {
 	char word[greatestWordSize];
@@ -27,6 +28,7 @@ struct diskNode {
 };
 
 void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedListFilename, SecundaryTree& tree);
+void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree);
 std::deque<int> readInvertedList(std::string invertedListFileName, int indexOfList);
 int searchTreeOnDisk(std::string filename, std::string toSearch);
 

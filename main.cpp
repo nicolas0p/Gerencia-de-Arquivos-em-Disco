@@ -92,7 +92,7 @@ void pesquisaMultiplosConteudos(const Database& database) {
 	try {
 		result = database.multipleContentQuery(words[0], words[1]);
 	} catch (QueryException& e) {
-		cout << "Nenhuma manpage contem todas estas palavras!" << endl;
+		cout << "Nenhuma manpage contem ambas as palavras!" << endl;
 		return;
 	}
 	cout << "Manpages que contem as duas palavra:" << endl;
@@ -139,6 +139,9 @@ void console(int argc, char** argv, Database& database) {
 	}
 
 	indexFiles(argc, argv, database);
+	//database.removeConnectives(); //Não funcionando, segfault na arvore
+	cout << "Escrevendo arquivos em disco" <<endl;
+	database.writeIndexToDisk();
 
 	bool state = true;
 	while (state) {
@@ -174,7 +177,21 @@ void console(int argc, char** argv, Database& database) {
 }
 
 int main(int argc, char** argv) {
-	Database database("manpa.dat", "primaryIndex.dat", "secondaryIndex.dat","invertedLists.dat");
-
+	Database database("manpages.dat", "primaryIndex.dat", "secondaryIndex.dat","invertedLists.dat");
 	console(argc, argv, database);
 }
+/*
+int main() {
+	SecundaryTree tree;
+	tree.insert("one", 1); tree.insert("one", 2); tree.insert("one", 3); tree.insert("one", 4);
+	tree.insert("another", 5); tree.insert("another", 6); tree.insert("another", 7); tree.insert("another", 8);
+	string sec("secundaryTree.dat"), inverted("inverted.dat");
+	writeSecondaryTreeToDisk(sec, inverted, tree);
+	int pos = searchTreeOnDisk(sec,"another");
+
+	deque<int> a = readInvertedList(inverted ,pos);
+	for(size_t i = 0 ; i < a.size(); ++i) {
+		cout << a[i] << endl;
+	}
+}
+*/
