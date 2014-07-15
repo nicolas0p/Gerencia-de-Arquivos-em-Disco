@@ -60,10 +60,10 @@ void Database::insert(string filename) {
 
 	writeManPage(disk, manpageFileName_, manpageIndex_);
 	primaryIndexTree.insert(manpage.name(), manpageIndex_);
+
 	for (size_t i = 0; i < words.size(); ++i) { //adicionar todas as palavras do conteudo na indexacao secundaria
 		secondaryIndexTree.insert(words[i], manpageIndex_);
 	}
-
 	++manpageIndex_; //atualizar index
 }
 
@@ -110,7 +110,9 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 		swap(lesser, greater);
 	}
 	deque<int> both;
-	//TODO
+	for (size_t i = 0; i < lesser.size(); ++i) {
+		//TODO
+	}
 
 
 	return deque<string>();
@@ -205,7 +207,7 @@ string Database::removeExtension(string& name) const {
 }
  /**
   * Remove da indexacao secundaria os conectivos
-  * NÃO FUNCIONANDO SEGFAULT NA REMOCAO DA ARVORE
+  * NÃO FUNCIONANDO. SEGFAULT NA REMOCAO DA ARVORE
   */
 void Database::removeConnectives() {
 	deque<string> toRemove;
