@@ -144,7 +144,6 @@ std::deque<int> readInvertedList(std::string invertedListFileName,
  * Faz uma pesquisa numa arvore em disco, retornando o inteiro guardado junto com a string
  * @param Nome do arquivo onde a arvore  esta gravada
  * @param Palavra que será pesquisada na arvore
- *
  * A arvore e gravada no disco como uma lista ordenada, tendo seu tamanho no inicio
  */
 int searchTreeOnDisk(std::string filename, std::string toSearch) {
@@ -175,6 +174,14 @@ int searchTreeOnDisk(std::string filename, std::string toSearch) {
 	throw QueryException();
 }
 
+/**
+ * Pesquisa se um inteiro esta contido no deque
+ * @param deque onde o inteiro sera procurado
+ * @param posicao de inicio
+ * @param posicao de fim
+ * @param inteiro que se deseja pesquisar
+ * @return A posicao do inteiro na lista, se não tiver na lista retorna -1
+ */
 int binarySearch(std::deque<int> array, int first, int last, int search_key) {
 	int index;
 
