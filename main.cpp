@@ -139,7 +139,7 @@ void console(int argc, char** argv, Database& database) {
 		indexFiles(argc, argv, database);
 	}
 
-	//database.removeConnectives(); //Não funcionando, segfault na arvore
+	database.removeConnectives(); //Não funcionando, segfault na arvore
 	cout << "Escrevendo arquivos em disco" <<endl;
 	database.writeIndexToDisk();
 
@@ -180,20 +180,3 @@ int main(int argc, char** argv) {
 	Database database("manpages.dat", "primaryIndex.dat", "secondaryIndex.dat","invertedLists.dat");
 	console(argc, argv, database);
 }
-/*
-int main() {
-	PrimaryTree tree;
-	tree.insert("one", 1);// tree.insert("one", 2); tree.insert("one", 3); tree.insert("one", 4);
-	tree.insert("five", 5);// tree.insert("another", 6); tree.insert("another", 7); tree.insert("another", 8);
-	tree.insert("two", 2);
-	string sec("primaryTree.dat"), inverted("inverted.dat");
-	writePrimaryTreeToDisk(sec, tree);
-	int pos = searchTreeOnDisk(sec,"two");
-	cout << pos << endl;
-
-	deque<int> a = readInvertedList(inverted ,pos);
-	for(size_t i = 0 ; i < a.size(); ++i) {
-		cout << a[i] << endl;
-	}
-}*/
-

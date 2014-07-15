@@ -118,7 +118,7 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 	while(!lesser->empty()) {
 		int actual = lesser->front();
 		lesser->pop_front();
-		int result = binarySearch(*greater, 0, greater->size()-1, actual);
+		int result = binarySearch(*greater, 0, greater->size() - 1, actual);
 		if(result != -1) {
 			both.push_back(actual);
 		}
@@ -126,8 +126,8 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 
 	deque<string> ret;
 	while (!both.empty()) {
-		int actual = lesser->front();
-		lesser->pop_front();
+		int actual = both.front();
+		both.pop_front();
 		ret.push_back(readName(manpageFileName_, actual));
 	}
 

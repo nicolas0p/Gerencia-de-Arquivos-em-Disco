@@ -68,19 +68,6 @@ void writeSecondaryTreeToDisk(std::string treeFilename,
 		treeFile.write((char *) &add, sizeof(diskNode));
 		++count; //atualizar posicao onde a proxima lista vai ser gravada no arquivo
 	}
-
-	//
-	//	for (SecundaryTree::iterator it = tree.begin(); it != tree.end(); ++it) {
-	//		StringTreeUnion actual = *it;
-	//		int i = 0;
-	//		for (AvlTree::iterator ite = actual.tree->begin(); ite != actual.tree->end(); ++ite) { //itera sobre a arvore
-	//			int toWrite = *ite;
-	//			invertedListFile.seekp(count * greatestListSize * sizeof(int) + i * sizeof(int) + sizeof(int));
-	//			invertedListFile.write((char *) &toWrite, sizeof(int));
-	//			++i;
-	//		}
-	//
-	//	}
 }
 
 /**
@@ -175,20 +162,21 @@ int searchTreeOnDisk(std::string filename, std::string toSearch) {
 	throw QueryException();
 }
 
-int binarySearch(std::deque<int> array, int first, int last, int search_key) {
+int binarySearch(const std::deque<int> &array, int first, int last, int search_key) {
 	int index;
 
-	if (first > last)
+	if (first > last) {
 		index = -1;
+	}
 	else {
 		int middle = (first + last) / 2;
 
 		if (search_key == array[middle])
 			index = middle;
 		else if (search_key < array[middle])
-			index = binarySearch(array, first, middle - 1, search_key);
+			index = binarySearch(array, first, middle -1, search_key);
 		else
-			index = binarySearch(array, middle + 1, last, search_key);
+			index = binarySearch(array, middle - 1, last, search_key);
 
 	}
 	return index;
