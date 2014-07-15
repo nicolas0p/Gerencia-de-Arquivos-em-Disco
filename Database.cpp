@@ -101,21 +101,19 @@ deque<string> Database::contentQuery(string word) const {
  * @return vetor contendo o nome de todas as manpages que contem ambas as palavras
  */
 deque<string> Database::multipleContentQuery(string first, string second) const {
-	deque<string> ret;
-	AvlTree *lesser = secondaryIndexTree.search(first);
-	AvlTree *greater = secondaryIndexTree.search(second);
+	int firstPosition = searchTreeOnDisk(secondaryIndexFileName_, first);
+	int secondPosition = searchTreeOnDisk(secondaryIndexFileName_, second);
+	deque<int> greater = readInvertedList(invertedListFileName_, firstPosition);
+	deque<int> lesser = readInvertedList(invertedListFileName_, secondPosition);
 
-	if (greater->size() < lesser->size()) {
-		swap(greater, lesser);
+	if(lesser.size() > greater.size()) {
+		swap(lesser, greater);
 	}
+	deque<int> both;
+	//TODO
 
-	for (AvlTree::iterator it = lesser->begin(); it != lesser->end(); ++it) {
-		if (greater->search(*it)) {
-			ret.push_back(readName(manpageFileName_, *it));
-		}
-	}
 
-	return ret;
+	return deque<string>();
 }
 /**
  * Deleta os arquivos de indice primário, secundário, lista invertida e manpages do disco

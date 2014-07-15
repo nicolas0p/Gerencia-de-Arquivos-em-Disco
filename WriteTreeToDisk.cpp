@@ -71,7 +71,6 @@ void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree) {
 	if(!treeFile) {
 			std::cout << "Erro ao abrir o arquivo " << treeFilename << std::endl;
 		}
-
 	int treeSize = tree.size();
 	treeFile.write((char *) &treeSize, sizeof(int)); //grava o tamanho da lista
 
@@ -79,10 +78,12 @@ void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree) {
 	for (PrimaryTree::iterator it = tree.begin(); it != tree.end(); ++it) {
 		StringIntUnion actual = *it;
 
-		diskNode add(actual.string.c_str(), count); //nodo contendo a palavra e a localizacao da sua manpage no arquivo
+		diskNode add(actual.string.c_str(), actual.integer); //nodo contendo a palavra e a localizacao da sua manpage no arquivo
 		treeFile.seekp(count * sizeof(diskNode) + sizeof(int));
 		treeFile.write((char *) &add, sizeof(diskNode));
 		++count; //atualizar posicao onde a proxima lista vai ser gravada no arquivo
+
+		std::cout << actual.string  << " escrito em disco-"<< count << std::endl;
 	}
 }
 

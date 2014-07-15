@@ -182,16 +182,18 @@ int main(int argc, char** argv) {
 }
 /*
 int main() {
-	SecundaryTree tree;
-	tree.insert("one", 1); tree.insert("one", 2); tree.insert("one", 3); tree.insert("one", 4);
-	tree.insert("another", 5); tree.insert("another", 6); tree.insert("another", 7); tree.insert("another", 8);
-	string sec("secundaryTree.dat"), inverted("inverted.dat");
-	writeSecondaryTreeToDisk(sec, inverted, tree);
-	int pos = searchTreeOnDisk(sec,"another");
+	PrimaryTree tree;
+	tree.insert("one", 1);// tree.insert("one", 2); tree.insert("one", 3); tree.insert("one", 4);
+	tree.insert("five", 5);// tree.insert("another", 6); tree.insert("another", 7); tree.insert("another", 8);
+	tree.insert("two", 2);
+	string sec("primaryTree.dat"), inverted("inverted.dat");
+	writePrimaryTreeToDisk(sec, tree);
+	int pos = searchTreeOnDisk(sec,"two");
+	cout << pos << endl;
 
 	deque<int> a = readInvertedList(inverted ,pos);
 	for(size_t i = 0 ; i < a.size(); ++i) {
 		cout << a[i] << endl;
 	}
-}
-*/
+}*/
+
