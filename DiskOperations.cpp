@@ -41,6 +41,7 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 			int toWrite = indexes.front();
 			indexes.pop_front();
 			invertedListFile.seekp(count * greatestListSize * sizeof(int) + i * sizeof(int)	+ sizeof(int));
+
 			invertedListFile.write((char *) &toWrite, sizeof(int));
 			++i;
 		}

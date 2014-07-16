@@ -49,7 +49,6 @@ void pesquisaConteudo(const Database& database) {
 	while (true) {
 		cout << "Deseja pesquisar por qual palavra?" << endl;
 		getline(cin, input);
-
 		if (input.length() > 0)
 			break;
 	}
@@ -146,7 +145,6 @@ void console(int argc, char** argv, Database& database) {
 			}
 		}
 	}
-
 	while (state) {
 		int opcao;
 		while (true) {
