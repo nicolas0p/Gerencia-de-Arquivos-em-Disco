@@ -15,7 +15,7 @@
 #include "Database.h"
 #include "QueryException.h"
 #include "SecundaryTree.h"
-#include "WriteTreeToDisk.h"
+#include "DiskOperations.h"
 
 using namespace std;
 
@@ -49,7 +49,6 @@ void pesquisaConteudo(const Database& database) {
 	while (true) {
 		cout << "Deseja pesquisar por qual palavra?" << endl;
 		getline(cin, input);
-
 		if (input.length() > 0)
 			break;
 	}
@@ -135,13 +134,13 @@ void console(int argc, char** argv, Database& database) {
 		manter = tolower(input.at(0));
 	}
 	if (manter == 'n') {
-		database.clear();
-		indexFiles(argc, argv, database);
+		//database.clear();
+		//indexFiles(argc, argv, database);
 	}
 
-	database.removeConnectives(); //Não funcionando, segfault na arvore
+	//database.removeConnectives(); //Não funcionando, segfault na arvore
 	cout << "Escrevendo arquivos em disco" <<endl;
-	database.writeIndexToDisk();
+	//database.writeIndexToDisk();
 
 	bool state = true;
 	while (state) {

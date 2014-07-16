@@ -12,7 +12,7 @@
 #include <sstream>
 
 #include "Database.h"
-#include "WriteTreeToDisk.h"
+#include "DiskOperations.h"
 #include "AvlTree.h"
 
 using namespace std;
@@ -24,10 +24,10 @@ using namespace std;
  */
 Database::Database(string manpageFileName, string primaryIndexFileName,
 		string secondayIndexFileName, string invertedListFileName) :
-		primaryIndexTree(), secondaryIndexTree(), manpageFileName_(manpageFileName), primaryIndexFileName_(
-				primaryIndexFileName), secondaryIndexFileName_(
-				secondayIndexFileName), invertedListFileName_(
-				invertedListFileName), manpageIndex_(0) {
+				primaryIndexTree(), secondaryIndexTree(), manpageFileName_(manpageFileName), primaryIndexFileName_(
+						primaryIndexFileName), secondaryIndexFileName_(
+								secondayIndexFileName), invertedListFileName_(
+										invertedListFileName), manpageIndex_(0) {
 }
 
 Database::~Database() {
@@ -115,6 +115,17 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 		swap(lesser, greater);
 	}
 	deque<int> both;
+
+//	int size = lesser->size();
+//	for (int i = 0; i < size; i++) {
+//		int actual = lesser->front();
+//		lesser->pop_front();
+//		int result = binarySearch(*greater, 0, greater->size() - 1, actual);
+//		if(result != -1) {
+//			both.push_back(actual);
+//		}
+//	}
+	int i = 0;
 	while(!lesser->empty()) {
 		int actual = lesser->front();
 		lesser->pop_front();
@@ -122,6 +133,7 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 		if(result != -1) {
 			both.push_back(actual);
 		}
+		++i;
 	}
 
 	deque<string> ret;
@@ -221,10 +233,10 @@ string Database::removeExtension(string& name) const {
 	}
 	return name.substr(0, i);
 }
- /**
-  * Remove da indexacao secundaria os conectivos
-  * NÃO FUNCIONANDO. SEGFAULT NA REMOCAO DA ARVORE
-  */
+/**
+ * Remove da indexacao secundaria os conectivos
+ * NÃO FUNCIONANDO. SEGFAULT NA REMOCAO DA ARVORE
+ */
 void Database::removeConnectives() {
 	deque<string> toRemove;
 	toRemove.push_back("a"); toRemove.push_back("an"); toRemove.push_back("the"); toRemove.push_back("or");

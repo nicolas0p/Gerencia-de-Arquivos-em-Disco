@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "QueryException.h"
-#include "WriteTreeToDisk.h"
+#include "DiskOperations.h"
 
 using namespace std;
 
@@ -54,14 +54,14 @@ void writeSecondaryTreeToDisk(std::string treeFilename,
 			indexes.pop_front();
 			invertedListFile.seekp(
 					count * greatestListSize * sizeof(int) + i * sizeof(int)
-							+ sizeof(int));
+			+ sizeof(int));
 			invertedListFile.write((char *) &toWrite, sizeof(int));
 			++i;
 		}
 		int endOfList = -1;
 		invertedListFile.seekp(
 				count * greatestListSize * sizeof(int) + i * sizeof(int)
-						+ sizeof(int));
+		+ sizeof(int));
 		invertedListFile.write((char *) &endOfList, sizeof(int)); //escreve -1 depois do ultimo elemento para marcar o fim da lista
 		diskNode add(actual.string.c_str(), count); //nodo contendo a palavra e a localizacao de sua lista no arquivo
 		treeFile.seekp(count * sizeof(diskNode) + sizeof(int));
@@ -88,7 +88,6 @@ void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree) {
 	while (nodes.size() > 0) {
 		StringIntUnion actual = nodes.front();
 		nodes.pop_front();
-		cout << actual.string << " " << actual.integer << endl;
 		diskNode add(actual.string.c_str(), actual.integer); //nodo contendo a palavra e a localizacao da sua manpage no arquivo
 		treeFile.seekp(count * sizeof(diskNode) + sizeof(int));
 		treeFile.write((char *) &add, sizeof(diskNode));
@@ -161,9 +160,6 @@ int searchTreeOnDisk(std::string filename, std::string toSearch) {
 	throw QueryException();
 }
 
-<<<<<<< HEAD
-int binarySearch(const std::deque<int> &array, int first, int last, int search_key) {
-=======
 /**
  * Pesquisa se um inteiro esta contido no deque
  * @param deque onde o inteiro sera procurado
@@ -172,23 +168,17 @@ int binarySearch(const std::deque<int> &array, int first, int last, int search_k
  * @param inteiro que se deseja pesquisar
  * @return A posicao do inteiro na lista, se não tiver na lista retorna -1
  */
-int binarySearch(std::deque<int> array, int first, int last, int search_key) {
->>>>>>> 50a610e8e79505799950382be174b95fea03b18e
-	int index;
-
-	if (first > last) {
-		index = -1;
-	}
-	else {
+int binarySearch(const std::deque<int> &array, int first, int last, int search_key) {
+	while (first <= last) {
 		int middle = (first + last) / 2;
-
-		if (search_key == array[middle])
-			index = middle;
-		else if (search_key < array[middle])
-			index = binarySearch(array, first, middle -1, search_key);
-		else
-			index = binarySearch(array, middle - 1, last, search_key);
-
+		int found = array[middle];
+		if (search_key == found) {
+			return found;
+		} else if (search_key > found) {
+			first = middle + 1;
+		} else {
+			last = middle - 1;
+		}
 	}
-	return index;
+	return -1;
 }
