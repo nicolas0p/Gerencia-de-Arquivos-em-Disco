@@ -12,8 +12,12 @@
 
 class QueryException : public std::exception {
 public:
-	QueryException();
-	virtual ~QueryException() throw ();
+	QueryException() {
+
+	}
+	virtual ~QueryException() throw () {
+
+	}
 };
 
 #endif /* QUERYEXCEPTION_H_ */
