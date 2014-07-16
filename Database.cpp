@@ -25,10 +25,10 @@ using namespace std;
  */
 Database::Database(string manpageFileName, string primaryIndexFileName,
 		string secondayIndexFileName, string invertedListFileName) :
-				primaryIndexTree(), secondaryIndexTree(), manpageFileName_(manpageFileName), primaryIndexFileName_(
-						primaryIndexFileName), secondaryIndexFileName_(
-								secondayIndexFileName), invertedListFileName_(
-										invertedListFileName), manpageIndex_(0) {
+						primaryIndexTree(), secondaryIndexTree(), manpageFileName_(manpageFileName), primaryIndexFileName_(
+								primaryIndexFileName), secondaryIndexFileName_(
+										secondayIndexFileName), invertedListFileName_(
+												invertedListFileName), manpageIndex_(0) {
 }
 
 Database::~Database() {
@@ -57,11 +57,10 @@ void Database::insert(string filename) {
 
 	}
 	filename = removeExtension(filename);
-	Manpage manpage(filename, words);
 	diskManpage disk(filename.c_str(), concatenated.c_str());
 
 	writeManPage(disk, manpageFileName_, manpageIndex_);
-	primaryIndexTree.insert(manpage.name(), manpageIndex_);
+	primaryIndexTree.insert(filename, manpageIndex_);
 
 	for (size_t i = 0; i < words.size(); ++i) { //adicionar todas as palavras do conteudo na indexacao secundaria
 		secondaryIndexTree.insert(words[i], manpageIndex_);
@@ -110,30 +109,34 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 
 	deque<int> *greater = &one;
 	deque<int> *lesser = &another;
-
 	if(lesser->size() > greater->size()) {
 		swap(lesser, greater);
 	}
-	deque<int> both;
 
-//	int size = lesser->size();
-//	for (int i = 0; i < size; i++) {
-//		int actual = lesser->front();
-//		lesser->pop_front();
-//		int result = binarySearch(*greater, 0, greater->size() - 1, actual);
-//		if(result != -1) {
-//			both.push_back(actual);
-//		}
-//	}
-	int i = 0;
+	deque<int> both;
 	while(!lesser->empty()) {
-		int actual = lesser->front();
+		int element = lesser->front();
 		lesser->pop_front();
-		int result = binarySearch(*greater, actual);
-		if(result != -1) {
-			both.push_back(actual);
+
+		bool found = false;
+		int first = 0;
+		int last = greater->size() - 1; //realiza uma busca binaria, verificando se o elemento do deque lesser existe no deque greater.
+		while (first <= last) {
+			int middle = (first + last) / 2;
+			int actual = greater->at(middle);
+			if (element == actual) {
+				found = true;
+				break;
+			} else if (element > actual) {
+				first = middle + 1;
+			} else {
+				last = middle - 1;
+			}
 		}
-		++i;
+
+		if(found) {
+			both.push_back(element);
+		}
 	}
 
 	deque<string> ret;
@@ -154,72 +157,6 @@ void Database::clear() {
 	remove(secondaryIndexFileName_.c_str());
 	remove(invertedListFileName_.c_str());
 }
-
-/**
- *	Escreve um registro na posicao index
- *	@param manpage a ser escrita em disco
- *	@param nome do arquivo onde a manpage será escrita
- *	@param posicao relativa do arquivo no arquivo de manpages
- */
-void Database::writeManPage(diskManpage& manpage, string fileName, int index) {
-	ofstream output(fileName.c_str(), ios::app | ios::binary);
-
-	if (!output) {
-		cout << "Erro ao abrir arquivo " << fileName << endl;
-		return;
-	}
-
-	if (index > -1) {
-		output.seekp(index * sizeof(diskManpage));
-	}
-
-	output.write((char *) &manpage, sizeof(diskManpage));
-}
-
-/**
- * Le um registro de manpage do arquivo fileName na posicao recordIndex
- * @param O nome do arquivo que se deseja ler
- * @param A posicao do registro que sera lido
- * @return diskManpage lido da posicao recordIndex
- */
-diskManpage Database::readManPage(string fileName, int manpageIndex) const {
-	ifstream input(fileName.c_str(), ios::in | ios::binary);
-
-	if (!input) {
-		cout << "Erro ao abrir arquivo " << fileName << endl;
-	}
-
-	input.seekg(manpageIndex * sizeof(diskManpage));
-
-	diskManpage mp("", "");
-	input.read((char *) &mp, sizeof(diskManpage));
-
-	return mp;
-}
-
-/**
- * Le o nome do comando na posicao recordIndex
- * @param O nome do arquivo que se deseja ler
- * @param a posicao do registro que sera lido
- * @return nome do comando na posicao recordIndex
- */
-string Database::readName(string fileName, int recordIndex) const {
-	ifstream input(fileName.c_str(), ios::in | ios::binary);
-
-	if (!input) {
-		cout << "Erro ao abrir arquivo " << fileName << endl;
-	}
-
-	input.seekg(recordIndex * sizeof(diskManpage));
-
-	char name[MAX_MANPAGE_NAME_SIZE];
-
-	input.read(name, MAX_MANPAGE_NAME_SIZE);
-
-	return name;
-}
-
-
 
 /**
  * Remove da indexacao secundaria os conectivos

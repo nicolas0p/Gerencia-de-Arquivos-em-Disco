@@ -130,27 +130,42 @@ int searchTreeOnDisk(std::string filename, std::string toSearch) {
 	throw QueryException();
 }
 
+/*/
+ * Escreve uma manpage no arquivo na posicao index
+ * @param A discManpage a ser escrita
+ * @param O nome do arquivo onde ela será escrita
+ * @param A posição no arquivo onde ela será escrita
+ */
+void writeManPage(diskManpage& manpage, string fileName, int index) {
+	ofstream output(fileName.c_str(), ios::app | ios::binary);
+	output.seekp(index * sizeof(diskManpage));
+	output.write((char *) &manpage, sizeof(diskManpage));
+}
 
 /**
- * Pesquisa se um inteiro esta contido no deque
- * @param deque onde o inteiro sera procurado
- * @param inteiro que se deseja pesquisar
- * @return A posicao do inteiro na lista, se não tiver na lista retorna -1
+ * Le um registro de manpage do arquivo fileName na posicao recordIndex
+ * @param O nome do arquivo que se deseja ler
+ * @param A posicao do registro que sera lido
+ * @return diskManpage lido da posicao recordIndex
  */
-int binarySearch(const std::deque<int> &deque, int key) {
-	int first = 0;
-	int last = deque.size() - 1;
+diskManpage readManPage(string fileName, int manpageIndex) {
+	ifstream input(fileName.c_str(), ios::in | ios::binary);
+	input.seekg(manpageIndex * sizeof(diskManpage));
+	diskManpage mp("", "");
+	input.read((char *) &mp, sizeof(diskManpage));
+	return mp;
+}
 
-	while (first <= last) {
-		int middle = (first + last) / 2;
-		int found = deque[middle];
-		if (key == found) {
-			return found;
-		} else if (key > found) {
-			first = middle + 1;
-		} else {
-			last = middle - 1;
-		}
-	}
-	return -1;
+/**
+ * Le o nome do comando na posicao recordIndex
+ * @param O nome do arquivo que se deseja ler
+ * @param a posicao do registro que sera lido
+ * @return nome do comando na posicao recordIndex
+ */
+string readName(string fileName, int recordIndex) {
+	ifstream input(fileName.c_str(), ios::in | ios::binary);
+	input.seekg(recordIndex * sizeof(diskManpage));
+	char name[MAX_MANPAGE_NAME_SIZE];
+	input.read(name, MAX_MANPAGE_NAME_SIZE);
+	return name;
 }

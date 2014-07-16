@@ -11,7 +11,6 @@
 #include <vector>
 #include <sstream>
 
-#include "Manpage.h"
 #include "Database.h"
 #include "QueryException.h"
 #include "SecundaryTree.h"
@@ -118,6 +117,8 @@ void indexFiles(int argc, char** argv, Database& database) {
 		cout << "Arquivo-" << i << " "<< filename << " lido" << endl;
 		++i;
 	}
+	database.removeConnectives();
+	database.writeIndexToDisk();
 }
 
 /**
@@ -138,8 +139,6 @@ void console(int argc, char** argv, Database& database) {
 			if (opcao == 's') {
 				database.clear();
 				indexFiles(argc, argv, database);
-				database.removeConnectives();
-				database.writeIndexToDisk();
 			} else if (opcao == 'n') {
 				state = false;
 			}
@@ -152,13 +151,14 @@ void console(int argc, char** argv, Database& database) {
 			cout << "1) Fazer uma pesquisa por nome da manpage." << endl;
 			cout << "2) Fazer uma pesquisa por palavra no conteúdo de uma manpage" << endl;
 			cout << "3) Fazer uma pesquisa por manpage contendo duas palavras expecíficas" << endl;
-			cout << "4) Sair do programa" << endl;
+			cout << "4) Indexar arquivos novamente (pode levar algum tempo)." << endl;
+			cout << "5) Sair do programa" << endl;
 			getline(cin, input);
 			stringstream nro(input);
 			nro >> opcao;
-			if (opcao > 0 && opcao < 5)
+			if (opcao > 0 && opcao < 6)
 				break;
-			cout << "Opcao invalida. Digite um numero entre 1 e 4" << endl;
+			cout << "Opcao invalida. Digite um numero entre 1 e 5" << endl;
 		}
 		switch (opcao) {
 		case 1:
@@ -171,6 +171,12 @@ void console(int argc, char** argv, Database& database) {
 			pesquisaMultiplosConteudos(database);
 			break;
 		case 4:
+			database.clear();
+			indexFiles(argc, argv, database);
+			database.removeConnectives();
+			database.writeIndexToDisk();
+			break;
+		case 5:
 			state = false;
 			break;
 		}
