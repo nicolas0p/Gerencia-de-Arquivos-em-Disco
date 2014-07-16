@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "QueryException.h"
-#include "WriteTreeToDisk.h"
+#include "DiskOperations.h"
 
 using namespace std;
 
@@ -21,26 +21,14 @@ using namespace std;
  * @param Nome do arquivo onde as listas invertidas serao gravadas
  * @param Arvore que sera gravada no arquivo
  */
-void writeSecondaryTreeToDisk(std::string treeFilename,
-		std::string invertedListFilename, SecundaryTree& tree) {
+void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedListFilename, SecundaryTree& tree) {
 	std::ofstream treeFile(treeFilename.c_str(), std::ios::binary);
-
-	if (!treeFile) {
-		std::cout << "Erro ao abrir o arquivo " << treeFilename << std::endl;
-	}
+	std::ofstream invertedListFile(invertedListFilename.c_str(), std::ios::binary);
 
 	int treeSize = tree.size();
 	treeFile.write((char *) &treeSize, sizeof(int)); //grava o tamanho da lista
 	int greatestListSize = tree.greatestListSize() + 1; //+1 espaço para o -1 no fim
-	//escreve o tamanho da maior lista
-	std::ofstream invertedListFile(invertedListFilename.c_str(),
-			std::ios::binary);
-	if (!invertedListFile) {
-		std::cout << "Erro ao abrir o arquivo " << invertedListFilename
-				<< std::endl;
-	}
-
-	invertedListFile.write((char *) &greatestListSize, sizeof(int));
+	invertedListFile.write((char *) &greatestListSize, sizeof(int)); //escreve o tamanho da maior lista
 
 	int count = 0;
 	std::deque<StringTreeUnion> deque = tree.toDeque();
@@ -52,21 +40,18 @@ void writeSecondaryTreeToDisk(std::string treeFilename,
 		while (indexes.size() > 0) {
 			int toWrite = indexes.front();
 			indexes.pop_front();
-			invertedListFile.seekp(
-					count * greatestListSize * sizeof(int) + i * sizeof(int)
-							+ sizeof(int));
+			invertedListFile.seekp(count * greatestListSize * sizeof(int) + i * sizeof(int)	+ sizeof(int));
 			invertedListFile.write((char *) &toWrite, sizeof(int));
 			++i;
 		}
 		int endOfList = -1;
-		invertedListFile.seekp(
-				count * greatestListSize * sizeof(int) + i * sizeof(int)
-						+ sizeof(int));
+		invertedListFile.seekp(count * greatestListSize * sizeof(int) + i * sizeof(int) + sizeof(int));
 		invertedListFile.write((char *) &endOfList, sizeof(int)); //escreve -1 depois do ultimo elemento para marcar o fim da lista
+
 		diskNode add(actual.string.c_str(), count); //nodo contendo a palavra e a localizacao de sua lista no arquivo
 		treeFile.seekp(count * sizeof(diskNode) + sizeof(int));
 		treeFile.write((char *) &add, sizeof(diskNode));
-		++count; //atualizar posicao onde a proxima lista vai ser gravada no arquivo
+		++count;
 	}
 }
 
@@ -77,10 +62,6 @@ void writeSecondaryTreeToDisk(std::string treeFilename,
  */
 void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree) {
 	std::ofstream treeFile(treeFilename.c_str(), std::ios::binary);
-
-	if (!treeFile) {
-		std::cout << "Erro ao abrir o arquivo " << treeFilename << std::endl;
-	}
 	int treeSize = tree.size();
 	treeFile.write((char *) &treeSize, sizeof(int)); //grava o tamanho da lista
 	int count = 0;
@@ -88,7 +69,6 @@ void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree) {
 	while (nodes.size() > 0) {
 		StringIntUnion actual = nodes.front();
 		nodes.pop_front();
-		cout << actual.string << " " << actual.integer << endl;
 		diskNode add(actual.string.c_str(), actual.integer); //nodo contendo a palavra e a localizacao da sua manpage no arquivo
 		treeFile.seekp(count * sizeof(diskNode) + sizeof(int));
 		treeFile.write((char *) &add, sizeof(diskNode));
@@ -102,20 +82,13 @@ void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree) {
  * @param posicao da lista que se deseja ler no arquivo de listas
  * @return lista de posicoes das manpages que esta lista contem
  */
-std::deque<int> readInvertedList(std::string invertedListFileName,
-		int indexOfList) {
+std::deque<int> readInvertedList(std::string invertedListFileName, int indexOfList) {
 	std::ifstream file(invertedListFileName.c_str(), std::ios::binary);
-
-	if (!file) {
-		std::cout << "Erro ao abrir o arquivo " << invertedListFileName
-				<< std::endl;
-	}
+	int size;
+	file.read((char *) &size, sizeof(int)); //lê o tamanho do registro
 
 	std::deque<int> numbers;
-	int size;
-	file.read((char *) &size, sizeof(int)); //lê o tamanho padrao das listas
 	int listPosition = indexOfList * size; //posicao da lista no arquivo
-
 	int read;
 	for (int i = 0; i < size; ++i) {
 		file.seekg(listPosition * sizeof(int) + i * sizeof(int) + sizeof(int)); //posicao lista + posicao elemento + int (tamanho no inicio)
@@ -135,18 +108,13 @@ std::deque<int> readInvertedList(std::string invertedListFileName,
  */
 int searchTreeOnDisk(std::string filename, std::string toSearch) {
 	std::ifstream list(filename.c_str(), std::ios::binary);
-
-	if (!list) {
-		std::cout << "Erro ao abrir o arquivo " << filename << std::endl;
-	}
-
 	int size;
 	list.read((char *) &size, sizeof(int));
-	list.seekg(sizeof(int));
 
-	int left = 0, right = size - 1;
+	int left = 0;
+	int right = size - 1;
 	diskNode found("", 0);
-	while (left <= right) {
+	while (left <= right) { //busca binaria no arquivo
 		int middle = (right + left) / 2;
 		list.seekg(middle * sizeof(diskNode) + sizeof(int));
 		list.read((char *) &found, sizeof(diskNode));
@@ -161,34 +129,27 @@ int searchTreeOnDisk(std::string filename, std::string toSearch) {
 	throw QueryException();
 }
 
-<<<<<<< HEAD
-int binarySearch(const std::deque<int> &array, int first, int last, int search_key) {
-=======
+
 /**
  * Pesquisa se um inteiro esta contido no deque
  * @param deque onde o inteiro sera procurado
- * @param posicao de inicio
- * @param posicao de fim
  * @param inteiro que se deseja pesquisar
  * @return A posicao do inteiro na lista, se não tiver na lista retorna -1
  */
-int binarySearch(std::deque<int> array, int first, int last, int search_key) {
->>>>>>> 50a610e8e79505799950382be174b95fea03b18e
-	int index;
+int binarySearch(const std::deque<int> &deque, int key) {
+	int first = 0;
+	int last = deque.size() - 1;
 
-	if (first > last) {
-		index = -1;
-	}
-	else {
+	while (first <= last) {
 		int middle = (first + last) / 2;
-
-		if (search_key == array[middle])
-			index = middle;
-		else if (search_key < array[middle])
-			index = binarySearch(array, first, middle -1, search_key);
-		else
-			index = binarySearch(array, middle - 1, last, search_key);
-
+		int found = deque[middle];
+		if (key == found) {
+			return found;
+		} else if (key > found) {
+			first = middle + 1;
+		} else {
+			last = middle - 1;
+		}
 	}
-	return index;
+	return -1;
 }

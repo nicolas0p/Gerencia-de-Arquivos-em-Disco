@@ -12,8 +12,9 @@
 #include <sstream>
 
 #include "Database.h"
-#include "WriteTreeToDisk.h"
+#include "DiskOperations.h"
 #include "AvlTree.h"
+#include "TextProcessing.h"
 
 using namespace std;
 
@@ -107,7 +108,6 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 	deque<int> one = readInvertedList(invertedListFileName_, firstPosition);
 	deque<int> another = readInvertedList(invertedListFileName_, secondPosition);
 
-
 	deque<int> *greater = &one;
 	deque<int> *lesser = &another;
 
@@ -118,7 +118,7 @@ deque<string> Database::multipleContentQuery(string first, string second) const 
 	while(!lesser->empty()) {
 		int actual = lesser->front();
 		lesser->pop_front();
-		int result = binarySearch(*greater, 0, greater->size() - 1, actual);
+		int result = binarySearch(*greater, actual);
 		if(result != -1) {
 			both.push_back(actual);
 		}
@@ -207,23 +207,9 @@ string Database::readName(string fileName, int recordIndex) const {
 	return name;
 }
 
-/**
- * Retira tudo que vem depois do ultimo ponto de uma string
- * @param Palavra que se quer tirar a extensao
- * @return A palavra sem extensao
- */
-string Database::removeExtension(string& name) const {
-	int i = name.length() - 1;
-	for (; i >= 0; --i) {
-		if (name[i] == '.') {
-			break;
-		}
-	}
-	return name.substr(0, i);
-}
+
  /**
   * Remove da indexacao secundaria os conectivos
-  * NÃO FUNCIONANDO. SEGFAULT NA REMOCAO DA ARVORE
   */
 void Database::removeConnectives() {
 	deque<string> toRemove;
@@ -251,4 +237,31 @@ void Database::removeConnectives() {
 void Database::writeIndexToDisk() {
 	writePrimaryTreeToDisk(primaryIndexFileName_, primaryIndexTree);
 	writeSecondaryTreeToDisk(secondaryIndexFileName_, invertedListFileName_, secondaryIndexTree);
+}
+
+/**
+ * Verifica se os arquivos de indexacao ja existem
+ * @return verdadeiro se os arquivos ja existirem
+ */
+bool Database::filesIndexed() {
+	std::ifstream file(manpageFileName_.c_str());
+
+	if(!file.is_open())
+		return false;
+	file.close();
+
+	file.open(primaryIndexFileName_.c_str());
+	if(!file.is_open())
+		return false;
+	file.close();
+
+	file.open(secondaryIndexFileName_.c_str());
+	if(!file.is_open())
+		return false;
+	file.close();
+
+	file.open(invertedListFileName_.c_str());
+	if(!file.is_open())
+		return false;
+	return true;
 }

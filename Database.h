@@ -44,6 +44,7 @@ public:
 	void clear();
 	void writeIndexToDisk();
 	void removeConnectives();
+	bool filesIndexed();
 
 private:
 	//variaveis
@@ -59,7 +60,6 @@ private:
 	void writeManPage(diskManpage& manpage, string fileName, int index);
 	diskManpage readManPage(string fileName,int recordIndex) const;
 	string readName(string fileName,int recordIndex) const;
-	string removeExtension(string& name) const;
 };
 
 #endif /* DATABASE_H_ */

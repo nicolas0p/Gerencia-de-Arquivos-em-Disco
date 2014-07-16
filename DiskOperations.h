@@ -31,6 +31,6 @@ void writeSecondaryTreeToDisk(std::string treeFilename,	std::string invertedList
 void writePrimaryTreeToDisk(std::string treeFilename, PrimaryTree& tree);
 std::deque<int> readInvertedList(std::string invertedListFileName, int indexOfList);
 int searchTreeOnDisk(std::string filename, std::string toSearch);
-int binarySearch(const std::deque<int> &array, int first, int last, int search_key);
+int binarySearch(const std::deque<int> &deque, int key);
 
 #endif /* WRITETREETODISK_H_ */

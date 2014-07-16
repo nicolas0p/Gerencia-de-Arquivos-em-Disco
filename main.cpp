@@ -15,7 +15,7 @@
 #include "Database.h"
 #include "QueryException.h"
 #include "SecundaryTree.h"
-#include "WriteTreeToDisk.h"
+#include "DiskOperations.h"
 
 using namespace std;
 
@@ -126,31 +126,34 @@ void indexFiles(int argc, char** argv, Database& database) {
  * @param database que sera usada
  */
 void console(int argc, char** argv, Database& database) {
-	string input;
-
-	char manter = 'n'; //trocar
-	while (manter != 's' && manter != 'n' && manter != 'y') {
-		cout << "Deseja utilizar a indexação de manpages existente? Se nao, os arquivos anteriores serao deletados:" << endl;
-		getline(cin, input);
-		manter = tolower(input.at(0));
-	}
-	if (manter == 'n') {
-		database.clear();
-		indexFiles(argc, argv, database);
-	}
-
-	database.removeConnectives(); //Não funcionando, segfault na arvore
-	cout << "Escrevendo arquivos em disco" <<endl;
-	database.writeIndexToDisk();
-
 	bool state = true;
+	string input;
+	if (!database.filesIndexed()) {
+		cout << "Os arquivos ainda não foram indexados. Para realizar alguma busca, é necessário indexa-los (isso pode levar algum tempo)." << endl;
+		cout << "Você deseja indexar os arquivos? Se não, o programa será fechado." << endl;
+		char opcao = 'k';
+		while (opcao != 'n' && opcao != 's') {
+			cout << "Digite sim ou não." << endl;
+			getline(cin, input);
+			opcao = tolower(input.at(0));
+			if (opcao == 's') {
+				database.clear();
+				indexFiles(argc, argv, database);
+				database.removeConnectives();
+				database.writeIndexToDisk();
+			} else if (opcao == 'n') {
+				state = false;
+			}
+		}
+	}
+
 	while (state) {
 		int opcao;
 		while (true) {
 			cout << "Digite o numero da opcao desejada:" << endl;
 			cout << "1) Fazer uma pesquisa por nome da manpage." << endl;
-			cout << "2) Fazer uma pesquisa por manpage contendo uma palavra expecifica" << endl;
-			cout << "3) Fazer uma pesquisa por manpage contendo diversas palavras" << endl;
+			cout << "2) Fazer uma pesquisa por palavra no conteúdo de uma manpage" << endl;
+			cout << "3) Fazer uma pesquisa por manpage contendo duas palavras expecíficas" << endl;
 			cout << "4) Sair do programa" << endl;
 			getline(cin, input);
 			stringstream nro(input);
@@ -178,5 +181,13 @@ void console(int argc, char** argv, Database& database) {
 
 int main(int argc, char** argv) {
 	Database database("manpages.dat", "primaryIndex.dat", "secondaryIndex.dat","invertedLists.dat");
+	//database.clear();
 	console(argc, argv, database);
+
 }
+/*
+int main() {
+	Database database("manpages.dat", "primaryIndex.dat", "secondaryIndex.dat","invertedLists.dat");
+	database.clear();
+	cout << database.filesIndexed();
+}*/
